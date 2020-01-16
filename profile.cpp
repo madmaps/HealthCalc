@@ -23,8 +23,10 @@ Profile::Profile(const QByteArray& inProfileData)
     int dataSize;
     char chunkID;
     int dataLocation = 0;
-    int month,day,year;
     int j, nameSize;
+    unsigned int localDataLocation = 0;
+    int weightData = 0;
+    qint64 dateData;
 
     int i = 0;
     while (i<numberOfChunks)
@@ -33,43 +35,79 @@ Profile::Profile(const QByteArray& inProfileData)
         switch(chunkID)
         {
         case 0x05:
-            nameSize = inProfileData.at(dataLocation + header + 3);
+            localDataLocation = 3;
+            nameSize = inProfileData.at(header + dataLocation + localDataLocation);
+            localDataLocation++;
             j = 0;
             while(j < nameSize)
             {
-                name += inProfileData.at(dataLocation + header + 3 +j);
+                name += inProfileData.at(dataLocation + header + localDataLocation);
                 j++;
+                localDataLocation++;
             }
 
-            highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 1);
+            dateData = 0;
+            for(unsigned int k = 0;k <= 7; k++)
+            {
+                dateData |= inProfileData.at(header + dataLocation + localDataLocation) << (8 * k);
+                localDataLocation++;
+            }
+            dob = QDate::fromJulianDay(dateData);
+
+            /*highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 1);
             lowByte = inProfileData.at(dataLocation + header + 3 + nameSize + 2);
             month = ((highByte >> 4) & 0x0f) + 1;
             day = (((highByte & 0x0f) << 1) | ((lowByte >> 7) & 0x01)) + 1;
             year = (lowByte & 0x7f) + 1924;
-            dob = QDate(year,month,day);
+            dob = QDate(year,month,day);*/
 
-            lowByte = inProfileData.at(dataLocation + header + 3 + nameSize + 3);
+            lowByte = inProfileData.at(dataLocation + header + localDataLocation);
             height = ((lowByte >> 1) & 0x7f);
 
-            gender = lowByte & 0x01;
+            if((lowByte & 0x01) == 0x01)
+            {
+                gender = true;
+            }
+            else
+            {
+                gender = false;
+            }
+            localDataLocation++;
 
-            highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 4);
+            weightData = 0;
+            for(unsigned int k = 0; k <= 3; k++)
+            {
+                weightData |= (unsigned char)inProfileData.at(dataLocation + header + localDataLocation) << (k * 8);
+                localDataLocation++;
+            }
+            initialWeight = (float)weightData/1000;
+
+            weightData = 0;
+            for(unsigned int k = 0; k <= 3; k++)
+            {
+                weightData |= (unsigned char)inProfileData.at(dataLocation + header + localDataLocation) << (k * 8);
+                localDataLocation++;
+            }
+            targetWeight = (float)weightData/1000;
+
+            /*highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 4);
             lowByte = inProfileData.at(dataLocation + header + 3 + nameSize + 5);
             initialWeight = (float)((highByte << 8) | lowByte) / 10;
 
             highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 6);
             lowByte = inProfileData.at(dataLocation + header + 3 + nameSize + 7);
             targetWeight = (float)((highByte << 8) | lowByte) / 10;
+            */
 
-            highByte = inProfileData.at(dataLocation + header + 1);
-            lowByte = inProfileData.at(dataLocation + header + 2);
+            lowByte = (unsigned char)inProfileData.at(dataLocation + header + 1);
+            highByte = (unsigned char)inProfileData.at(dataLocation + header + 2);
             dataSize = (highByte << 8) | lowByte;
             dataLocation += dataSize;
             break;
 
         default:
-            highByte = inProfileData.at(dataLocation + header + 1);
-            lowByte = inProfileData.at(dataLocation + header + 2);
+            lowByte = inProfileData.at(dataLocation + header + 1);
+            highByte = inProfileData.at(dataLocation + header + 2);
             dataSize = (highByte << 8) | lowByte;
             dataLocation += dataSize;
             break;

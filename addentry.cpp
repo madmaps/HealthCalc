@@ -21,7 +21,7 @@ void AddEntry::clearEntry()
 
 void AddEntry::on_pushButton_clicked()
 {
-    addNewEntry(ui->lineEdit->text().toUInt(),ui->dateTimeEdit->dateTime(),ui->lineEdit_2->text().toUInt(),ui->lineEdit_3->text().toUInt());
+    addNewEntry(ui->lineEdit->text().toFloat(),ui->dateTimeEdit->dateTime(),ui->lineEdit_2->text().toUInt(),ui->lineEdit_3->text().toUInt());
     hide();
 }
 

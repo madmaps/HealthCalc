@@ -18,7 +18,7 @@ public:
     void clearEntry();
 
 signals:
-    void addNewEntry(unsigned int inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned);
+    void addNewEntry(float inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned);
 
 private slots:
     void on_pushButton_clicked();

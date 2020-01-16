@@ -15,7 +15,36 @@ Entry::Entry(const Entry& inEntry) : weight(inEntry.weight), dateTime(inEntry.da
 
 Entry::Entry(const std::vector<char>& inEntryData)
 {
+    unsigned int dataPlace = 0;
+    qint64 dateTimeData = 0;
+    for(unsigned int i = 0; i <= 7; i++)
+    {
+        dateTimeData |= (unsigned char)inEntryData.at(dataPlace) << (i * 8);
+        dataPlace++;
+    }
+    dateTime = QDateTime::fromSecsSinceEpoch(dateTimeData);
 
+    unsigned int weightData = 0;
+    for(unsigned int i = 0; i <= 3; i++)
+    {
+        weightData |= (unsigned char)inEntryData.at(dataPlace) << (i * 8);
+        dataPlace++;
+    }
+    weight = (float)weightData/1000;
+
+    caloriesConsumed = 0;
+    for(unsigned int i = 0; i <= 3; i++)
+    {
+        caloriesConsumed |= (unsigned char)inEntryData.at(dataPlace) << (i * 8);
+        dataPlace++;
+    }
+
+    caloriesBurned = 0;
+    for(unsigned int i = 0; i <= 3; i++)
+    {
+        caloriesBurned |= (unsigned char)inEntryData.at(dataPlace) << (i * 8);
+        dataPlace++;
+    }
 }
 
 

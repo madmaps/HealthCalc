@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     profile = new Profile(QString("Matthew"),QDate(1983,9,12),67,1,235,170);
 
 
-    connect(entryWindow,SIGNAL(addNewEntry(unsigned int,QDateTime,unsigned int, unsigned int)),this,SLOT(gettingNewEntry(unsigned int,QDateTime,unsigned int,unsigned int)));
+    connect(entryWindow,SIGNAL(addNewEntry(float,QDateTime,unsigned int, unsigned int)),this,SLOT(gettingNewEntry(float,QDateTime,unsigned int,unsigned int)));
 }
 
 MainWindow::~MainWindow()
@@ -27,7 +27,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::gettingNewEntry(unsigned int inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned)
+void MainWindow::gettingNewEntry(float inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned)
 {
     Entry newEntry(inWeight,inDateTime,inCaloriesConsumed,inCaloriesBurned);
     listOfEntries.push_back(newEntry);
@@ -185,36 +185,38 @@ void MainWindow::loadFile()
                             profile = 0;
                         }
                         profile = new Profile(data);
-                        highByte = data.at(header + fileLocation + 1);
-                        lowByte = data.at(header + fileLocation + 2);
+                        lowByte = data.at(header + fileLocation + 1);
+                        highByte = data.at(header + fileLocation + 2);
                         overallSize = (highByte << 8) | lowByte;
                         fileLocation += overallSize;
                         break;
 
                     case 0x06:
-                        highByte = data.at(header + fileLocation + 1);
-                        lowByte = data.at(header + fileLocation + 2);
+                        lowByte = data.at(header + fileLocation + 1);
+                        highByte = data.at(header + fileLocation + 2);
                         overallSize = (highByte << 8) | lowByte;
                         numberOfEntries = overallSize / 20;
+                        listOfEntries.clear();
                         j = 0;
                         while(j < numberOfEntries)
                         {
                             entryData->clear();
-                            for(unsigned k = 0;k <= 19 ;k++)
+                            for(unsigned k = 0;k <= 19 ; k++)
                             {
-                                entryData->push_back(data.at(header + fileLocation + 3 + (j * 20)));
+                                entryData->push_back((unsigned char)data.at(header + fileLocation + 3 + (j * 20) + k));
                             }
                             listOfEntries.push_back(Entry(*entryData));
                             j++;
                         }
+                        updateEntries();
                         entryData->clear();
                         delete entryData;
                         fileLocation += overallSize;
                         break;
 
                     default:
-                        highByte = data.at(header + fileLocation + 1);
-                        lowByte = data.at(header + fileLocation + 2);
+                        lowByte = data.at(header + fileLocation + 1);
+                        highByte = data.at(header + fileLocation + 2);
                         overallSize = (highByte << 8) | lowByte;
                         fileLocation += overallSize;
                         break;

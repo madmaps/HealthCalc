@@ -25,7 +25,7 @@ private slots:
 
     void on_actionExit_triggered();
 
-    void gettingNewEntry(unsigned int inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned);
+    void gettingNewEntry(float inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned);
 
     void on_removeEntryButton_clicked();
 
