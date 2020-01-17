@@ -14,9 +14,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     newProfile->hide();
    // profile = 0;
     profile = new Profile(QString("Matthew"),QDate(1983,9,12),67,1,235,170);
+    updateProfile();
 
 
     connect(entryWindow,SIGNAL(addNewEntry(float,QDateTime,unsigned int, unsigned int)),this,SLOT(gettingNewEntry(float,QDateTime,unsigned int,unsigned int)));
+    connect(newProfile,SIGNAL(newProfile(Profile)),this,SLOT(gettingNewProfile(Profile)));
 }
 
 MainWindow::~MainWindow()
@@ -32,6 +34,18 @@ void MainWindow::gettingNewEntry(float inWeight,QDateTime inDateTime,unsigned in
     Entry newEntry(inWeight,inDateTime,inCaloriesConsumed,inCaloriesBurned);
     listOfEntries.push_back(newEntry);
     updateEntries();
+}
+
+void MainWindow::gettingNewProfile(Profile inProfile)
+{
+    if(profile != 0)
+    {
+        delete profile;
+        profile = 0;
+    }
+    profile = new Profile(inProfile);
+    updateProfile();
+
 }
 
 void MainWindow::on_newEntryButton_clicked()
@@ -185,6 +199,8 @@ void MainWindow::loadFile()
                             profile = 0;
                         }
                         profile = new Profile(data);
+                        updateProfile();
+
                         lowByte = data.at(header + fileLocation + 1);
                         highByte = data.at(header + fileLocation + 2);
                         overallSize = (highByte << 8) | lowByte;
@@ -227,6 +243,25 @@ void MainWindow::loadFile()
             }
         }
     }
+}
+
+void MainWindow::updateProfile()
+{
+    ui->nameEditBox->setText(profile->getName());
+    ui->initialWeightEditBox->setText(QString::number(profile->getInitialWeight()));
+    ui->dobEditBox->setDate(profile->getDob());
+    QString theGender;
+    if(profile->getGender())
+    {
+        theGender += "Male";
+    }
+    else
+    {
+        theGender += "Female";
+    }
+    ui->genderEditBox->setText(theGender);
+    ui->heightEditBox->setText(QString::number(profile->getHeight()));
+    ui->targetWeightEditBox->setText(QString::number(profile->getTargetWeight()));
 }
 
 void MainWindow::on_actionSave_Profile_triggered()

@@ -27,6 +27,8 @@ private slots:
 
     void gettingNewEntry(float inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned);
 
+    void gettingNewProfile(Profile inProfile);
+
     void on_removeEntryButton_clicked();
 
     void on_actionNew_Profile_triggered();
@@ -43,6 +45,8 @@ private:
     void saveFile();
 
     void loadFile();
+
+    void updateProfile();
 
     Ui::MainWindow *ui;
     AddEntry* entryWindow;

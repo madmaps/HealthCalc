@@ -54,13 +54,6 @@ Profile::Profile(const QByteArray& inProfileData)
             }
             dob = QDate::fromJulianDay(dateData);
 
-            /*highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 1);
-            lowByte = inProfileData.at(dataLocation + header + 3 + nameSize + 2);
-            month = ((highByte >> 4) & 0x0f) + 1;
-            day = (((highByte & 0x0f) << 1) | ((lowByte >> 7) & 0x01)) + 1;
-            year = (lowByte & 0x7f) + 1924;
-            dob = QDate(year,month,day);*/
-
             lowByte = inProfileData.at(dataLocation + header + localDataLocation);
             height = ((lowByte >> 1) & 0x7f);
 
@@ -89,15 +82,6 @@ Profile::Profile(const QByteArray& inProfileData)
                 localDataLocation++;
             }
             targetWeight = (float)weightData/1000;
-
-            /*highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 4);
-            lowByte = inProfileData.at(dataLocation + header + 3 + nameSize + 5);
-            initialWeight = (float)((highByte << 8) | lowByte) / 10;
-
-            highByte = inProfileData.at(dataLocation + header + 3 + nameSize + 6);
-            lowByte = inProfileData.at(dataLocation + header + 3 + nameSize + 7);
-            targetWeight = (float)((highByte << 8) | lowByte) / 10;
-            */
 
             lowByte = (unsigned char)inProfileData.at(dataLocation + header + 1);
             highByte = (unsigned char)inProfileData.at(dataLocation + header + 2);
@@ -185,15 +169,6 @@ std::vector<char>* Profile::saveToFile()const
         fileData->push_back(returnData[0]);
     }
 
-
-
-
-    /*returnValue = ((dob.month()-1) << 12) | ((dob.day()-1) << 7) | ((dob.year()-1924) & 0x7f);
-    returnData[0] = (unsigned char)(returnValue & 0xff);
-    returnData[1] = (unsigned char)((returnValue >> 8) & 0xff);
-    fileData->push_back(returnData[0]);
-    fileData->push_back(returnData[1]);*/
-
     // Height Data & Gender (Bits hhhhhhhg)
     returnValue = ((height & 0x7f) << 1);
     if(gender)
@@ -210,11 +185,6 @@ std::vector<char>* Profile::saveToFile()const
         returnData[0] = (returnValue >> (i*8)) & 0xff;
         fileData->push_back(returnData[0]);
     }
-    /*returnValue = initialWeight * 10;
-    returnData[0] = (unsigned char)(returnValue & 0xff);
-    returnData[1] = (unsigned char)((returnValue >> 8) & 0xff);
-    fileData->push_back(returnData[0]);
-    fileData->push_back(returnData[1]);*/
 
     // Target Weight Data(4 bytes) Data * 10
     returnValue = (targetWeight * 1000);
@@ -223,12 +193,5 @@ std::vector<char>* Profile::saveToFile()const
         returnData[0] = (returnValue >> (i*8)) & 0xff;
         fileData->push_back(returnData[0]);
     }
-
-    /*returnValue = targetWeight * 10;
-    returnData[0] = (unsigned char)(returnValue & 0xff);
-    returnData[1] = (unsigned char)((returnValue >> 8) & 0xff);
-    fileData->push_back(returnData[0]);
-    fileData->push_back(returnData[1]);*/
-
     return fileData;
 }
