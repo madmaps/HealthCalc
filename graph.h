@@ -21,11 +21,11 @@ protected:
 
 private:
     std::vector<Entry>* listOfEntries;
-    QDate startDate;
-    QDate endDate;
+    QDateTime startDate;
+    QDateTime endDate;
     bool autoDate;
-    unsigned int lowWeight;
-    unsigned int highWeight;
+    float lowWeight;
+    float highWeight;
     bool autoWeight;
     float minWeight, maxWeight;
 };

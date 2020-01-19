@@ -13,6 +13,7 @@ public:
     Entry(const std::vector<char>& inEntryData);
 
     float getWeight()const;
+    QDateTime getDateTime()const;
 
     Entry operator=(const Entry& inEntry);
     bool operator<(const Entry& inEntry);

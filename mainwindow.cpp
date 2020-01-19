@@ -87,6 +87,8 @@ void MainWindow::updateEntries()
         ui->listWidget->addItem(display.toString());
     }
     ui->listWidget->update();
+    ui->label->updateVariables();
+    ui->label->update();
 }
 
 void MainWindow::on_actionNew_Profile_triggered()
@@ -229,6 +231,7 @@ void MainWindow::loadFile()
                             j++;
                         }
                         updateEntries();
+                        ui->label->updateVariables();
                         entryData->clear();
                         delete entryData;
                         fileLocation += overallSize;

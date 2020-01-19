@@ -34,6 +34,23 @@ void Graph::updateVariables()
         }
     }
 
+    float weightRange = maxWeight - minWeight;
+    if(weightRange < 5)
+    {
+        weightRange = 5;
+    }
+
+    highWeight = maxWeight + (weightRange * 0.20);
+    lowWeight = maxWeight - weightRange - (weightRange * 0.30);
+    startDate = listOfEntries->at(0).getDateTime();
+    qint64 secondsFromBegToEnd = listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch();
+    // If less than 5 days make it 5 days
+    if(secondsFromBegToEnd < 432000)
+    {
+        secondsFromBegToEnd = 432000;
+    }
+    endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 0.30));
+
 }
 
 void Graph::paintEvent(QPaintEvent*)
@@ -41,6 +58,7 @@ void Graph::paintEvent(QPaintEvent*)
     const int horizontalBorder = 35;
     const int verticalBorder = 35;
     const int gridSize = 20;
+    const int labelHeight = 20;
 
     QPainter painter(this);
     int width = this->width();
@@ -97,9 +115,75 @@ void Graph::paintEvent(QPaintEvent*)
         }
     }
 
+    // Draw Weight Points;
+    thePen.setWidth(5);
+    theColor.setRgb(255,0,0);
+    thePen.setColor(theColor);
+    secondPen.setColor(theColor);
+    secondPen.setWidth(1);
+    float weightPercent;
+    float datePercent;
+    int weightX;
+    int weightY;
+    int oldWeightX;
+    int oldWeightY;
+    i = 0;
+    while(i < (int)listOfEntries->size())
+    {
+        if(i > 0)
+        {
+            oldWeightX = weightX;
+            oldWeightY = weightY;
+        }
+        weightPercent = (listOfEntries->at(i).getWeight() - lowWeight) / (highWeight - lowWeight);
+        qint64 timeOne = listOfEntries->at(i).getDateTime().toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+        qint64 timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+        datePercent = (float)timeOne/(float)timeTwo;
+        weightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
+        weightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
+        painter.setPen(thePen);
+        painter.drawPoint(weightX,weightY);
+        if(i > 0)
+        {
+            painter.setPen(secondPen);
+            painter.drawLine(oldWeightX, oldWeightY, weightX, weightY);
+        }
+
+        i++;
+    }
+
+    //Draw date lines
+    theColor.setRgb(215,81,211);
+    thePen.setColor(theColor);
+    thePen.setWidth(1);
+    thePen.setStyle(Qt::DashLine);
+    painter.setPen(thePen);
+    unsigned int numberOfDateLabels = floor((float)(width - horizontalBorder) / (float)labelHeight);
+    qint64 secondsBetweenStartAndEnd = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+    unsigned int numberOfDaysBetweenStartAndEnd = floor((float)secondsBetweenStartAndEnd / 86400);
+    unsigned int dayDivisor = ceil((float)numberOfDaysBetweenStartAndEnd / (float)numberOfDateLabels);
+    unsigned int numberOfLabels = floor((float)numberOfDaysBetweenStartAndEnd / (float)dayDivisor);
+    QDate currentDate;
+    QDateTime secondDate;
+    int dateX;
+
+    i = 0;
+    while((unsigned int)i < numberOfLabels)
+    {
+        currentDate = QDate(startDate.date().year(),startDate.date().month(),startDate.date().day() + 1 + (i * dayDivisor));
+        secondDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
+        datePercent = (((float)(currentDate.toJulianDay() - startDate.date().toJulianDay())) + ((float)(startDate.toSecsSinceEpoch() - secondDate.toSecsSinceEpoch()) / (24*60*60))) / (float)(endDate.date().toJulianDay() - startDate.date().toJulianDay());
+        dateX = horizontalBorder + ((width - horizontalBorder) * datePercent);
+        painter.drawLine(dateX,height - verticalBorder,dateX, 0);
+
+        i++;
+    }
+
+
 
     //Redraw black border
     thePen.setWidth(1);
+    thePen.setStyle(Qt::SolidLine);
     theBrush.setStyle(Qt::NoBrush);
     theColor.setRgb(255,255,255);
     theBrush.setColor(theColor);

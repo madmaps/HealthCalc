@@ -18,6 +18,11 @@ float Entry::getWeight()const
     return weight;
 }
 
+QDateTime Entry::getDateTime()const
+{
+    return dateTime;
+}
+
 Entry::Entry(const std::vector<char>& inEntryData)
 {
     unsigned int dataPlace = 0;
