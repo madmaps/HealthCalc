@@ -13,6 +13,11 @@ Entry::Entry(const Entry& inEntry) : weight(inEntry.weight), dateTime(inEntry.da
 {
 }
 
+float Entry::getWeight()const
+{
+    return weight;
+}
+
 Entry::Entry(const std::vector<char>& inEntryData)
 {
     unsigned int dataPlace = 0;

@@ -5,8 +5,10 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    listOfEntries = new std::vector<Entry>();
     profileLoaded = false;
     ui->setupUi(this);
+    ui->label->setListOfEntries(listOfEntries);
     disableAll(true);
     entryWindow = new AddEntry(this);
     entryWindow->hide();
@@ -23,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    delete listOfEntries;
     delete profile;
     delete newProfile;
     delete entryWindow;
@@ -32,7 +35,7 @@ MainWindow::~MainWindow()
 void MainWindow::gettingNewEntry(float inWeight,QDateTime inDateTime,unsigned int inCaloriesConsumed,unsigned int inCaloriesBurned)
 {
     Entry newEntry(inWeight,inDateTime,inCaloriesConsumed,inCaloriesBurned);
-    listOfEntries.push_back(newEntry);
+    listOfEntries->push_back(newEntry);
     updateEntries();
 }
 
@@ -61,25 +64,25 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_removeEntryButton_clicked()
 {
-    if(listOfEntries.size()>0)
+    if(listOfEntries->size()>0)
     {
         unsigned int index = ui->listWidget->currentRow();
         unsigned long long i = index;
-        while(i<listOfEntries.size()-1)
+        while(i<listOfEntries->size()-1)
         {
-            listOfEntries.at(i) = listOfEntries.at(i+1);
+            listOfEntries->at(i) = listOfEntries->at(i+1);
             i++;
         }
-        listOfEntries.pop_back();
+        listOfEntries->pop_back();
         updateEntries();
     }
 }
 
 void MainWindow::updateEntries()
 {
-    std::sort(listOfEntries.begin(),listOfEntries.end());
+    std::sort(listOfEntries->begin(),listOfEntries->end());
     ui->listWidget->clear();
-    for(Entry display : listOfEntries)
+    for(Entry display : *listOfEntries)
     {
         ui->listWidget->addItem(display.toString());
     }
@@ -143,15 +146,15 @@ void MainWindow::saveFile()
 
         temp[0] = 0x06;
         outFile.write(temp,1);
-        unsigned int entryDataSize = 3 + 20 * listOfEntries.size();
+        unsigned int entryDataSize = 3 + 20 * listOfEntries->size();
         temp[0] = (unsigned char)(entryDataSize & 0xff);
         temp[1] = (unsigned char)((entryDataSize >> 8) & 0xff);
         outFile.write(temp,2);
 
         unsigned int i = 0;
-        while(i < listOfEntries.size())
+        while(i < listOfEntries->size())
         {
-            std::vector<char>* entryData = listOfEntries.at(i).saveEntryData();
+            std::vector<char>* entryData = listOfEntries->at(i).saveEntryData();
             for(unsigned int j = 0; j < entryData->size(); j++)
             {
                 temp[0] = entryData->at(j);
@@ -177,6 +180,7 @@ void MainWindow::loadFile()
             inFile.close();
             if(data.at(0) == 0x48 && data.at(1) == 0x45 && data.at(2) == 0x41 && data.at(3) == 0x43 && data.at(4) == 0x00 && data.at(5) == 0x01)
             {
+                disableAll(false);
                 unsigned int numberOfChunks = data.at(8);
                 unsigned int chunkID = 0;
                 unsigned int fileLocation = 0;
@@ -212,7 +216,7 @@ void MainWindow::loadFile()
                         highByte = data.at(header + fileLocation + 2);
                         overallSize = (highByte << 8) | lowByte;
                         numberOfEntries = overallSize / 20;
-                        listOfEntries.clear();
+                        listOfEntries->clear();
                         j = 0;
                         while(j < numberOfEntries)
                         {
@@ -221,7 +225,7 @@ void MainWindow::loadFile()
                             {
                                 entryData->push_back((unsigned char)data.at(header + fileLocation + 3 + (j * 20) + k));
                             }
-                            listOfEntries.push_back(Entry(*entryData));
+                            listOfEntries->push_back(Entry(*entryData));
                             j++;
                         }
                         updateEntries();

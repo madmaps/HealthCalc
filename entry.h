@@ -12,6 +12,8 @@ public:
     Entry(const Entry& inEntry);
     Entry(const std::vector<char>& inEntryData);
 
+    float getWeight()const;
+
     Entry operator=(const Entry& inEntry);
     bool operator<(const Entry& inEntry);
     QString toString();

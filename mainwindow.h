@@ -50,7 +50,7 @@ private:
 
     Ui::MainWindow *ui;
     AddEntry* entryWindow;
-    std::vector<Entry> listOfEntries;
+    std::vector<Entry>* listOfEntries;
     NewProfile* newProfile;
     bool profileLoaded;
     Profile* profile;
