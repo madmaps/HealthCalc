@@ -83,16 +83,18 @@ Profile::Profile(const QByteArray& inProfileData)
             }
             targetWeight = (float)weightData/1000;
 
-            lowByte = (unsigned char)inProfileData.at(dataLocation + header + 1);
-            highByte = (unsigned char)inProfileData.at(dataLocation + header + 2);
-            dataSize = (highByte << 8) | lowByte;
+            dataSize = 0;
+            lowByte = inProfileData.at(dataLocation + header + 1);
+            highByte = inProfileData.at(dataLocation + header + 2);
+            dataSize = ((unsigned char)highByte << 8) | (unsigned char)lowByte;
             dataLocation += dataSize;
             break;
 
         default:
+            dataSize = 0;
             lowByte = inProfileData.at(dataLocation + header + 1);
             highByte = inProfileData.at(dataLocation + header + 2);
-            dataSize = (highByte << 8) | lowByte;
+            dataSize = ((unsigned char)highByte << 8) | (unsigned char)lowByte;
             dataLocation += dataSize;
             break;
         }

@@ -43,13 +43,17 @@ void Graph::updateVariables()
     highWeight = maxWeight + (weightRange * 0.20);
     lowWeight = maxWeight - weightRange - (weightRange * 0.30);
     startDate = listOfEntries->at(0).getDateTime();
+    startDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
     qint64 secondsFromBegToEnd = listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch();
+
     // If less than 5 days make it 5 days
     if(secondsFromBegToEnd < 432000)
     {
         secondsFromBegToEnd = 432000;
     }
     endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 0.30));
+    endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
+    endDate = QDateTime(endDate.date().addDays(1));
 
 }
 
@@ -127,6 +131,7 @@ void Graph::paintEvent(QPaintEvent*)
     int weightY;
     int oldWeightX;
     int oldWeightY;
+    qint64 timeOne, timeTwo;
     i = 0;
     while(i < (int)listOfEntries->size())
     {
@@ -136,8 +141,8 @@ void Graph::paintEvent(QPaintEvent*)
             oldWeightY = weightY;
         }
         weightPercent = (listOfEntries->at(i).getWeight() - lowWeight) / (highWeight - lowWeight);
-        qint64 timeOne = listOfEntries->at(i).getDateTime().toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
-        qint64 timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+        timeOne = listOfEntries->at(i).getDateTime().toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+        timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
         datePercent = (float)timeOne/(float)timeTwo;
         weightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
         weightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
@@ -163,19 +168,19 @@ void Graph::paintEvent(QPaintEvent*)
     unsigned int numberOfDaysBetweenStartAndEnd = floor((float)secondsBetweenStartAndEnd / 86400);
     unsigned int dayDivisor = ceil((float)numberOfDaysBetweenStartAndEnd / (float)numberOfDateLabels);
     unsigned int numberOfLabels = floor((float)numberOfDaysBetweenStartAndEnd / (float)dayDivisor);
-    QDate currentDate;
-    QDateTime secondDate;
+    QDateTime currentDate;
     int dateX;
 
     i = 0;
     while((unsigned int)i < numberOfLabels)
     {
-        currentDate = QDate(startDate.date().year(),startDate.date().month(),startDate.date().day() + 1 + (i * dayDivisor));
-        secondDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
-        datePercent = (((float)(currentDate.toJulianDay() - startDate.date().toJulianDay())) + ((float)(startDate.toSecsSinceEpoch() - secondDate.toSecsSinceEpoch()) / (24*60*60))) / (float)(endDate.date().toJulianDay() - startDate.date().toJulianDay());
+        currentDate = startDate;
+        currentDate = QDateTime(currentDate.date().addDays(dayDivisor * i));
+        timeOne = currentDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+        timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+        datePercent = (float)timeOne/(float)timeTwo;
         dateX = horizontalBorder + ((width - horizontalBorder) * datePercent);
         painter.drawLine(dateX,height - verticalBorder,dateX, 0);
-
         i++;
     }
 

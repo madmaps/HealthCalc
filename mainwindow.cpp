@@ -207,17 +207,19 @@ void MainWindow::loadFile()
                         profile = new Profile(data);
                         updateProfile();
 
+                        overallSize = 0;
                         lowByte = data.at(header + fileLocation + 1);
                         highByte = data.at(header + fileLocation + 2);
-                        overallSize = (highByte << 8) | lowByte;
+                        overallSize = ((unsigned char)highByte << 8) | (unsigned char)lowByte;
                         fileLocation += overallSize;
                         break;
 
                     case 0x06:
+                        overallSize = 0;
                         lowByte = data.at(header + fileLocation + 1);
                         highByte = data.at(header + fileLocation + 2);
-                        overallSize = (highByte << 8) | lowByte;
-                        numberOfEntries = overallSize / 20;
+                        overallSize = ((unsigned char)highByte << 8) | (unsigned char)lowByte;
+                        numberOfEntries = (float)overallSize / 20;
                         listOfEntries->clear();
                         j = 0;
                         while(j < numberOfEntries)
@@ -238,9 +240,10 @@ void MainWindow::loadFile()
                         break;
 
                     default:
+                        overallSize = 0;
                         lowByte = data.at(header + fileLocation + 1);
                         highByte = data.at(header + fileLocation + 2);
-                        overallSize = (highByte << 8) | lowByte;
+                        overallSize = ((unsigned char)highByte << 8) | (unsigned char)lowByte;
                         fileLocation += overallSize;
                         break;
 
