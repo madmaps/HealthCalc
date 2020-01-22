@@ -60,7 +60,7 @@ void Graph::updateVariables()
 void Graph::paintEvent(QPaintEvent*)
 {
     const int horizontalBorder = 35;
-    const int verticalBorder = 35;
+    const int verticalBorder = 60;
     const int gridSize = 20;
     const int labelHeight = 20;
 
@@ -158,10 +158,14 @@ void Graph::paintEvent(QPaintEvent*)
     }
 
     //Draw date lines
-    theColor.setRgb(215,81,211);
+    theColor.setRgb(22,45,245);
     thePen.setColor(theColor);
     thePen.setWidth(1);
-    thePen.setStyle(Qt::DashLine);
+    thePen.setStyle(Qt::SolidLine);
+    secondPen.setStyle(Qt::DotLine);
+    secondPen.setWidth(5);
+    theColor.setRgb(216,220,254);
+    secondPen.setColor(theColor);
     painter.setPen(thePen);
     unsigned int numberOfDateLabels = floor((float)(width - horizontalBorder) / (float)labelHeight);
     qint64 secondsBetweenStartAndEnd = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
@@ -180,10 +184,15 @@ void Graph::paintEvent(QPaintEvent*)
         timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
         datePercent = (float)timeOne/(float)timeTwo;
         dateX = horizontalBorder + ((width - horizontalBorder) * datePercent);
+        painter.setPen(secondPen);
         painter.drawLine(dateX,height - verticalBorder,dateX, 0);
+        painter.setPen(thePen);
+        painter.drawLine(dateX,height - verticalBorder,dateX, 0);
+        painter.rotate(90);
+        painter.drawText(height - verticalBorder + 5,-dateX + 3,currentDate.toString("MM/dd/yy"));//dateX,height - 15,currentDate.toString("MM/dd/yy"));
+        painter.rotate(-90);
         i++;
     }
-
 
 
     //Redraw black border
