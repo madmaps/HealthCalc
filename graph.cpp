@@ -171,12 +171,12 @@ void Graph::paintEvent(QPaintEvent*)
     qint64 secondsBetweenStartAndEnd = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
     unsigned int numberOfDaysBetweenStartAndEnd = floor((float)secondsBetweenStartAndEnd / 86400);
     unsigned int dayDivisor = ceil((float)numberOfDaysBetweenStartAndEnd / (float)numberOfDateLabels);
-    unsigned int numberOfLabels = floor((float)numberOfDaysBetweenStartAndEnd / (float)dayDivisor);
+    unsigned int totalNumberOfDateLabels = floor((float)numberOfDaysBetweenStartAndEnd / (float)dayDivisor);
     QDateTime currentDate;
     int dateX;
 
     i = 0;
-    while((unsigned int)i < numberOfLabels)
+    while((unsigned int)i < totalNumberOfDateLabels)
     {
         currentDate = startDate;
         currentDate = QDateTime(currentDate.date().addDays(dayDivisor * i));
@@ -193,6 +193,42 @@ void Graph::paintEvent(QPaintEvent*)
         painter.rotate(-90);
         i++;
     }
+
+    //Draw weight lines
+    theColor.setRgb(249,117,126);
+    thePen.setColor(theColor);
+    thePen.setWidth(1);
+    thePen.setStyle(Qt::SolidLine);
+    secondPen.setStyle(Qt::DotLine);
+    secondPen.setWidth(5);
+    theColor.setRgb(254,235,236);
+    secondPen.setColor(theColor);
+    painter.setPen(thePen);
+    unsigned int numberOfWeightLabels = floor((float)(height - verticalBorder) / (float)labelHeight);
+    unsigned int numberOfTenPoundsBetweenHighAndLowWeights = ceil((highWeight - lowWeight) / 10);
+    unsigned int weightDivisor = ceil((float)numberOfTenPoundsBetweenHighAndLowWeights / (float)numberOfWeightLabels);
+    unsigned int totalNumberOfWeightLabels = floor((float)numberOfTenPoundsBetweenHighAndLowWeights / (float)weightDivisor);
+    float currentWeight;
+    int weightLocationY;
+
+    i = 0;
+    while((unsigned int)i < totalNumberOfWeightLabels)
+    {
+        currentWeight = floor(highWeight / 10) * 10;
+        currentWeight = currentWeight - (10 * (weightDivisor * i));
+        weightPercent = (currentWeight - lowWeight) / (highWeight - lowWeight);
+        if(weightPercent >= 0)
+        {
+            weightLocationY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
+            painter.setPen(secondPen);
+            painter.drawLine(horizontalBorder, weightLocationY, width, weightLocationY);
+            painter.setPen(thePen);
+            painter.drawLine(horizontalBorder, weightLocationY, width, weightLocationY);
+            painter.drawText(horizontalBorder - 20,weightLocationY + 5,QString::number(currentWeight));
+        }
+        i++;
+    }
+
 
 
     //Redraw black border
