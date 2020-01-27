@@ -14,6 +14,8 @@ public:
 
     float getWeight()const;
     QDateTime getDateTime()const;
+    unsigned int getCaloriesConsumed() const;
+    unsigned int getCaloriesBurned() const;
 
     Entry operator=(const Entry& inEntry);
     bool operator<(const Entry& inEntry);

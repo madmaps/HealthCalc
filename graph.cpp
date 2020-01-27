@@ -12,6 +12,11 @@ void Graph::setListOfEntries(std::vector<Entry>* inListOfEntries)
     listOfEntries = inListOfEntries;
 }
 
+void Graph::setProfile(Profile *inProfile)
+{
+    theProfile = inProfile;
+}
+
 void Graph::updateVariables()
 {
     //Finding max weight
@@ -54,6 +59,29 @@ void Graph::updateVariables()
     endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 0.30));
     endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
     endDate = QDateTime(endDate.date().addDays(1));
+    if(listOfEntries->size() > 0)
+    {
+        if(bmrData != 0)
+        {
+            bmrData->clear();
+            delete bmrData;
+            bmrData = 0;
+        }
+        bmrData = new std::vector<BMRData>;
+        Entry testEntry(listOfEntries->at(0));
+        BMRData firstIn(theProfile,&listOfEntries->at(0),0,theProfile->getInitialWeight());
+        bmrData->push_back(firstIn);
+
+        unsigned int i = 1;
+        while (i < listOfEntries->size()-1)
+        {
+            bmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),bmrData->at(i-1).getOutputWeight()));
+            i++;
+        }
+
+
+    }
+
 
 }
 

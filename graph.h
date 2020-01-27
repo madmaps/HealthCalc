@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QDate>
 #include "entry.h"
+#include "bmrdata.h"
+#include "profile.h"
 
 
 
@@ -13,6 +15,7 @@ public:
     explicit Graph(QWidget* parent = 0);
 
     void setListOfEntries(std::vector<Entry>* inListOfEntries);
+    void setProfile(Profile* inProfile);
 
     void updateVariables();
 
@@ -21,6 +24,8 @@ protected:
 
 private:
     std::vector<Entry>* listOfEntries;
+    Profile* theProfile;
+    std::vector<BMRData>* bmrData;
     QDateTime startDate;
     QDateTime endDate;
     bool autoDate;

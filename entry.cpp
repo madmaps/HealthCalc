@@ -23,6 +23,16 @@ QDateTime Entry::getDateTime()const
     return dateTime;
 }
 
+unsigned int Entry::getCaloriesConsumed() const
+{
+    return caloriesConsumed;
+}
+
+unsigned int Entry::getCaloriesBurned() const
+{
+    return caloriesBurned;
+}
+
 Entry::Entry(const std::vector<char>& inEntryData)
 {
     unsigned int dataPlace = 0;
