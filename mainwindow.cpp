@@ -257,6 +257,7 @@ void MainWindow::loadFile()
 
 void MainWindow::updateProfile()
 {
+    ui->label->setProfile(profile);
     ui->nameEditBox->setText(profile->getName());
     ui->initialWeightEditBox->setText(QString::number(profile->getInitialWeight()));
     ui->dobEditBox->setDate(profile->getDob());

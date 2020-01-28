@@ -35,7 +35,8 @@ void BMRData::calculateOutputWeight()
     unsigned int caloriesPerDay;
     if(thePreviousEntry != 0)
     {
-        caloriesPerDay = (theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned()) / ((theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
+
+        caloriesPerDay = (float)(theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned()) / (float)((theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
     }
     else
     {

@@ -4,7 +4,7 @@
 
 Graph::Graph(QWidget* parent) : QLabel(parent)
 {
-
+    bmrData = 0;
 }
 
 void Graph::setListOfEntries(std::vector<Entry>* inListOfEntries)
