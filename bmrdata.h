@@ -9,12 +9,14 @@ class BMRData
 public:
     BMRData(Profile* inProfile,Entry* inEntry,Entry* inPreviousEntry,float inPreviousWeight);
 
-    unsigned int getOutputWeight()const;
+    float getOutputWeight()const;
+    QDateTime getDateTime()const;
+
 private:
     void calculateBMR();
     void calculateOutputWeight();
 
-    unsigned int BMR;
+    int BMR;
     float initialWeight;
     float outputWeight;
     Profile* theProfile;

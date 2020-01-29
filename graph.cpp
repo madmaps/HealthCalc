@@ -68,12 +68,12 @@ void Graph::updateVariables()
             bmrData = 0;
         }
         bmrData = new std::vector<BMRData>;
-        Entry testEntry(listOfEntries->at(0));
-        BMRData firstIn(theProfile,&listOfEntries->at(0),0,theProfile->getInitialWeight());
+        Entry* testEntry = new Entry(listOfEntries->at(0));
+        BMRData firstIn(theProfile,testEntry,0,theProfile->getInitialWeight());
         bmrData->push_back(firstIn);
 
         unsigned int i = 1;
-        while (i < listOfEntries->size()-1)
+        while (i < listOfEntries->size())
         {
             bmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),bmrData->at(i-1).getOutputWeight()));
             i++;
@@ -184,6 +184,40 @@ void Graph::paintEvent(QPaintEvent*)
 
         i++;
     }
+
+    //Draw Prediction points
+    if(bmrData != 0)
+    {
+        thePen.setWidth(5);
+        theColor.setRgb(255,255,0);
+        thePen.setColor(theColor);
+        secondPen.setColor(theColor);
+        secondPen.setWidth(1);
+        i = 0;
+        while(i < (int)bmrData->size())
+        {
+            if(i > 0)
+            {
+                oldWeightX = weightX;
+                oldWeightY = weightY;
+            }
+            weightPercent = (bmrData->at(i).getOutputWeight() - lowWeight) / (highWeight - lowWeight);
+            timeOne = bmrData->at(i).getDateTime().toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+            timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+            datePercent = (float)timeOne/(float)timeTwo;
+            weightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
+            weightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
+            painter.setPen(thePen);
+            painter.drawPoint(weightX,weightY);
+            if(i > 0)
+            {
+                painter.setPen(secondPen);
+                painter.drawLine(oldWeightX, oldWeightY, weightX, weightY);
+            }
+            i++;
+        }
+    }
+
 
     //Draw date lines
     theColor.setRgb(22,45,245);

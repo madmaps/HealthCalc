@@ -10,9 +10,14 @@ BMRData::BMRData(Profile* inProfile,Entry* inEntry,Entry* inPreviousEntry,float 
     calculateOutputWeight();
 }
 
-unsigned int BMRData::getOutputWeight()const
+float BMRData::getOutputWeight()const
 {
     return outputWeight;
+}
+
+QDateTime BMRData::getDateTime() const
+{
+    return theEntry->getDateTime();
 }
 
 
@@ -32,16 +37,19 @@ void BMRData::calculateBMR()
 
 void BMRData::calculateOutputWeight()
 {
-    unsigned int caloriesPerDay;
+    int caloriesPerDay;
     if(thePreviousEntry != 0)
     {
 
-        caloriesPerDay = (float)(theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned()) / (float)((theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
+        caloriesPerDay = (float)(theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned()) / (float)((float)(theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
+        outputWeight = initialWeight - ((float)(BMR - caloriesPerDay) / 3500) * ((float)(theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
+
     }
     else
     {
         caloriesPerDay = theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned();
+        outputWeight = initialWeight - (float)(BMR - caloriesPerDay) / 3500;
+
     }
 
-    outputWeight = initialWeight - (float)(BMR - caloriesPerDay) / 3500;
 }
