@@ -25,7 +25,8 @@ protected:
 private:
     std::vector<Entry>* listOfEntries;
     Profile* theProfile;
-    std::vector<BMRData>* bmrData;
+    std::vector<BMRData>* lowerBmrData;
+    std::vector<BMRData>* upperBmrData;
     QDateTime startDate;
     QDateTime endDate;
     bool autoDate;

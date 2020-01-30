@@ -12,6 +12,8 @@ public:
     float getOutputWeight()const;
     QDateTime getDateTime()const;
 
+    void shift(float inAmount);
+
 private:
     void calculateBMR();
     void calculateOutputWeight();

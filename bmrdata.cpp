@@ -20,6 +20,11 @@ QDateTime BMRData::getDateTime() const
     return theEntry->getDateTime();
 }
 
+void BMRData::shift(float inAmount)
+{
+    outputWeight += inAmount;
+}
+
 
 void BMRData::calculateBMR()
 {
