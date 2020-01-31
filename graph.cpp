@@ -59,70 +59,89 @@ void Graph::updateVariables()
     endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 0.30));
     endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
     endDate = QDateTime(endDate.date().addDays(1));
-    if(listOfEntries->size() > 0)
+
+    float calorieOffset = 0;
+    float lowestDifferenceBetweenHighAndLow = 9999;
+    float tryOffset;
+    for(int k = -1000;k <= 1000;k+=5)
     {
-        if(lowerBmrData != 0)
+        if(k >= 950)
         {
-            lowerBmrData->clear();
-            upperBmrData->clear();
-            delete lowerBmrData;
-            delete upperBmrData;
-            lowerBmrData = 0;
-            upperBmrData = 0;
+            tryOffset = calorieOffset;
         }
-        lowerBmrData = new std::vector<BMRData>;
-        upperBmrData = new std::vector<BMRData>;
-        Entry* testEntry = new Entry(listOfEntries->at(0));
-        BMRData firstIn(theProfile,testEntry,0,theProfile->getInitialWeight());
-        lowerBmrData->push_back(firstIn);
-        upperBmrData->push_back(firstIn);
-
-        unsigned int i = 1;
-        while (i < listOfEntries->size())
+        else
         {
-            lowerBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight()));
-            upperBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight()));
-            i++;
+            tryOffset = k;
         }
-
-
-        float biggestNegativeDifference = 0;
-        i = 0;
-        while(i < listOfEntries->size())
+        if(listOfEntries->size() > 0)
         {
-            if(listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight() < biggestNegativeDifference)
+            if(lowerBmrData != 0)
             {
-                biggestNegativeDifference = listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight();
+                lowerBmrData->clear();
+                upperBmrData->clear();
+                delete lowerBmrData;
+                delete upperBmrData;
+                lowerBmrData = 0;
+                upperBmrData = 0;
             }
-            i++;
-        }
+            lowerBmrData = new std::vector<BMRData>;
+            upperBmrData = new std::vector<BMRData>;
+            Entry* testEntry = new Entry(listOfEntries->at(0));
+            BMRData firstIn(theProfile,testEntry,0,theProfile->getInitialWeight(),tryOffset);
+            lowerBmrData->push_back(firstIn);
+            upperBmrData->push_back(firstIn);
 
-        i = 0;
-        while(i < lowerBmrData->size())
-        {
-            lowerBmrData->at(i).shift(biggestNegativeDifference);
-            upperBmrData->at(i).shift(biggestNegativeDifference);
-            i++;
-        }
-
-        float biggestPositiveDifference = 0;
-        i = 0;
-        while(i < listOfEntries->size())
-        {
-            if(listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight() > biggestPositiveDifference)
+            unsigned int i = 1;
+            while (i < listOfEntries->size())
             {
-                biggestPositiveDifference = listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight();
+                lowerBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight(),tryOffset));
+                upperBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight(),tryOffset));
+                i++;
             }
-            i++;
-        }
 
-        i=0;
-        while(i < upperBmrData->size())
-        {
-            upperBmrData->at(i).shift(biggestPositiveDifference);
-            i++;
-        }
 
+            float biggestNegativeDifference = 0;
+            i = 0;
+            while(i < listOfEntries->size())
+            {
+                if(listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight() < biggestNegativeDifference)
+                {
+                    biggestNegativeDifference = listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight();
+                }
+                i++;
+            }
+
+            i = 0;
+            while(i < lowerBmrData->size())
+            {
+                lowerBmrData->at(i).shift(biggestNegativeDifference);
+                upperBmrData->at(i).shift(biggestNegativeDifference);
+                i++;
+            }
+
+            float biggestPositiveDifference = 0;
+            i = 0;
+            while(i < listOfEntries->size())
+            {
+                if(listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight() > biggestPositiveDifference)
+                {
+                    biggestPositiveDifference = listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight();
+                }
+                i++;
+            }
+            if(biggestPositiveDifference < lowestDifferenceBetweenHighAndLow)
+            {
+                lowestDifferenceBetweenHighAndLow = biggestPositiveDifference;
+                calorieOffset = k;
+            }
+            i=0;
+            while(i < upperBmrData->size())
+            {
+                upperBmrData->at(i).shift(biggestPositiveDifference);
+                i++;
+            }
+
+        }
     }
 
 }

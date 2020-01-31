@@ -7,7 +7,7 @@
 class BMRData
 {
 public:
-    BMRData(Profile* inProfile,Entry* inEntry,Entry* inPreviousEntry,float inPreviousWeight);
+    BMRData(Profile* inProfile,Entry* inEntry,Entry* inPreviousEntry,float inPreviousWeight,int inOtherCalories);
 
     float getOutputWeight()const;
     QDateTime getDateTime()const;
@@ -24,6 +24,7 @@ private:
     Profile* theProfile;
     Entry* theEntry;
     Entry* thePreviousEntry;
+    int otherCalories;
 };
 
 #endif // BMRDATA_H

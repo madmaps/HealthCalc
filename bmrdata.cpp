@@ -1,7 +1,8 @@
 #include "bmrdata.h"
 
-BMRData::BMRData(Profile* inProfile,Entry* inEntry,Entry* inPreviousEntry,float inPreviousWeight)
+BMRData::BMRData(Profile* inProfile,Entry* inEntry,Entry* inPreviousEntry,float inPreviousWeight,int inOtherCalories)
 {
+    otherCalories = inOtherCalories;
     theProfile = inProfile;
     theEntry = inEntry;
     thePreviousEntry = inPreviousEntry;
@@ -47,12 +48,14 @@ void BMRData::calculateOutputWeight()
     {
 
         caloriesPerDay = (float)(theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned()) / (float)((float)(theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
+        caloriesPerDay += otherCalories;
         outputWeight = initialWeight - ((float)(BMR - caloriesPerDay) / 3500) * ((float)(theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
 
     }
     else
     {
         caloriesPerDay = theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned();
+        caloriesPerDay += otherCalories;
         outputWeight = initialWeight - (float)(BMR - caloriesPerDay) / 3500;
 
     }
