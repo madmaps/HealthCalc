@@ -65,9 +65,11 @@ void Graph::updateVariables()
     float tryOffset;
     for(int k = -1000;k <= 1000;k+=5)
     {
-        if(k >= 950)
+        if(k >= 995)
         {
             tryOffset = calorieOffset;
+            unaccountedForCalories = calorieOffset;
+            range = lowestDifferenceBetweenHighAndLow;
         }
         else
         {
@@ -143,7 +145,33 @@ void Graph::updateVariables()
 
         }
     }
+    //get average calories burned per day
+    unsigned int i = 0;
+    float totalCalories = 0;
+    while(i < listOfEntries->size())
+    {
+        totalCalories += listOfEntries->at(i).getCaloriesConsumed() - listOfEntries->at(i).getCaloriesBurned();
+        i++;
+    }
+    float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
+    float averageCaloriesADay = totalCalories / totalDays;
+    averageCaloriesADay += unaccountedForCalories;
+    i = 0;
+    /*while(i < 200)
+    {
+        upperBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight(),tryOffset));
+        i++;
+    }*/
+}
 
+int Graph::getUnaccountedCalories() const
+{
+    return unaccountedForCalories;
+}
+
+float Graph::getWeightRange() const
+{
+    return range;
 }
 
 void Graph::paintEvent(QPaintEvent*)

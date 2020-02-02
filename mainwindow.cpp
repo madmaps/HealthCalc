@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <QFile>
+#include <math.h>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -89,6 +90,8 @@ void MainWindow::updateEntries()
     ui->listWidget->update();
     ui->label->updateVariables();
     ui->label->update();
+    ui->unnAccCaloriesLabel->setText(QString::number(ui->label->getUnaccountedCalories()));
+    ui->weightRangeLabel->setText(QString::number(floor(ui->label->getWeightRange()*10)/10) + QString(" Lbs"));
 }
 
 void MainWindow::on_actionNew_Profile_triggered()

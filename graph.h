@@ -18,6 +18,8 @@ public:
     void setProfile(Profile* inProfile);
 
     void updateVariables();
+    int getUnaccountedCalories()const;
+    float getWeightRange()const;
 
 protected:
     void paintEvent(QPaintEvent*);
@@ -34,6 +36,8 @@ private:
     float highWeight;
     bool autoWeight;
     float minWeight, maxWeight;
+    int unaccountedForCalories;
+    float range;
 };
 
 #endif // GRAPH_H
