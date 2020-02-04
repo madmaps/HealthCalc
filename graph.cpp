@@ -331,39 +331,6 @@ void Graph::paintEvent(QPaintEvent*)
             i++;
         }
     }
-    /*if(upperBmrData != 0)
-    {
-        thePen.setWidth(5);
-        theColor.setRgb(255,255,0);
-        thePen.setColor(theColor);
-        secondPen.setColor(theColor);
-        secondPen.setWidth(1);
-        i = 0;
-        while(i < (int)upperBmrData->size())
-        {
-            if(i > 0)
-            {
-                oldWeightX = weightX;
-                oldWeightY = weightY;
-            }
-            weightPercent = (upperBmrData->at(i).getOutputWeight() - lowWeight) / (highWeight - lowWeight);
-            timeOne = upperBmrData->at(i).getDateTime().toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
-            timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
-            datePercent = (float)timeOne/(float)timeTwo;
-            weightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
-            weightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
-            painter.setPen(thePen);
-            painter.drawPoint(weightX,weightY);
-            if(i > 0)
-            {
-                painter.setPen(secondPen);
-                painter.drawLine(oldWeightX, oldWeightY, weightX, weightY);
-            }
-            i++;
-        }
-    }*/
-
-
 
     //Draw date lines
     theColor.setRgb(22,45,245);

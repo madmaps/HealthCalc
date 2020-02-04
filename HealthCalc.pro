@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     addentry.cpp \
     bmrdata.cpp \
+    dataanalysis.cpp \
     entry.cpp \
     graph.cpp \
     main.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
 HEADERS += \
     addentry.h \
     bmrdata.h \
+    dataanalysis.h \
     entry.h \
     graph.h \
     mainwindow.h \
