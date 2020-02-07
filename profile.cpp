@@ -49,7 +49,7 @@ Profile::Profile(const QByteArray& inProfileData)
             dateData = 0;
             for(unsigned int k = 0;k <= 7; k++)
             {
-                dateData |= inProfileData.at(header + dataLocation + localDataLocation) << (8 * k);
+                dateData |= (unsigned char)inProfileData.at(header + dataLocation + localDataLocation) << (8 * k);
                 localDataLocation++;
             }
             dob = QDate::fromJulianDay(dateData);
@@ -167,7 +167,7 @@ std::vector<char>* Profile::saveToFile()const
     qint64 returnDate = dob.toJulianDay();
     for(int i = 0; i <= 7; i++)
     {
-        returnData[0] = (returnDate >> (i*8)) & 0xff;
+        returnData[0] = (unsigned char)(returnDate >> (i*8)) & 0xff;
         fileData->push_back(returnData[0]);
     }
 
@@ -184,7 +184,7 @@ std::vector<char>* Profile::saveToFile()const
     returnValue = (initialWeight * 1000);
     for(int i = 0; i <= 3; i++)
     {
-        returnData[0] = (returnValue >> (i*8)) & 0xff;
+        returnData[0] = (unsigned char)(returnValue >> (i*8)) & 0xff;
         fileData->push_back(returnData[0]);
     }
 
@@ -192,7 +192,7 @@ std::vector<char>* Profile::saveToFile()const
     returnValue = (targetWeight * 1000);
     for(int i = 0; i <= 3; i++)
     {
-        returnData[0] = (returnValue >> (i*8)) & 0xff;
+        returnData[0] = (unsigned char)(returnValue >> (i*8)) & 0xff;
         fileData->push_back(returnData[0]);
     }
     return fileData;

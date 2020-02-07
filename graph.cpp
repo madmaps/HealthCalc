@@ -4,7 +4,7 @@
 
 Graph::Graph(QWidget* parent) : QLabel(parent)
 {
-    lowerBmrData = 0;
+    //lowerBmrData = 0;
 }
 
 void Graph::setListOfEntries(std::vector<Entry>* inListOfEntries)
@@ -12,9 +12,10 @@ void Graph::setListOfEntries(std::vector<Entry>* inListOfEntries)
     listOfEntries = inListOfEntries;
 }
 
-void Graph::setProfile(Profile *inProfile)
+
+void Graph::setDataAnalysis(DataAnalysis *inDataAnalysis)
 {
-    theProfile = inProfile;
+    theDataAnalysis = inDataAnalysis;
 }
 
 void Graph::updateVariables()
@@ -60,7 +61,7 @@ void Graph::updateVariables()
     endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
     endDate = QDateTime(endDate.date().addDays(1));
 
-    float calorieOffset = 0;
+    /*float calorieOffset = 0;
     float lowestDifferenceBetweenHighAndLow = 9999;
     float tryOffset;
     for(int k = -1000;k <= 1000;k+=5)
@@ -162,16 +163,17 @@ void Graph::updateVariables()
         upperBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight(),tryOffset));
         i++;
     }*/
+    theDataAnalysis->updateVariables();
 }
 
 int Graph::getUnaccountedCalories() const
 {
-    return unaccountedForCalories;
+    return 0;//unaccountedForCalories;
 }
 
 float Graph::getWeightRange() const
 {
-    return range;
+    return 0;//range;
 }
 
 void Graph::paintEvent(QPaintEvent*)
@@ -244,10 +246,10 @@ void Graph::paintEvent(QPaintEvent*)
     secondPen.setWidth(1);
     float weightPercent;
     float datePercent;
-    int weightX;
-    int weightY;
-    int oldWeightX;
-    int oldWeightY;
+    int weightX = 0;
+    int weightY = 0;
+    int oldWeightX = 0;
+    int oldWeightY = 0;
     qint64 timeOne, timeTwo;
     i = 0;
     while(i < (int)listOfEntries->size())
@@ -276,7 +278,7 @@ void Graph::paintEvent(QPaintEvent*)
 
     //Draw Prediction points
 
-    if(lowerBmrData != 0)
+    if(theDataAnalysis != 0)
     {
         int upperWeightX, upperWeightY;
         int oldUpperWeightX, oldUpperWeightY;
@@ -290,7 +292,7 @@ void Graph::paintEvent(QPaintEvent*)
         secondPen.setColor(theColor);
         secondPen.setWidth(5);
         i = 0;
-        while(i < (int)lowerBmrData->size())
+        while(i < (int)theDataAnalysis->getSizeOfBMRData())
         {
             if(i > 0)
             {
@@ -299,15 +301,15 @@ void Graph::paintEvent(QPaintEvent*)
                 oldUpperWeightX = upperWeightX;
                 oldUpperWeightY = upperWeightY;
             }
-            weightPercent = (lowerBmrData->at(i).getOutputWeight() - lowWeight) / (highWeight - lowWeight);
-            timeOne = lowerBmrData->at(i).getDateTime().toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+            weightPercent = (theDataAnalysis->getLowerBMRWeightAt(i) - lowWeight) / (highWeight - lowWeight);
+            timeOne = theDataAnalysis->getBMRDataSecondsSinceEpoch(i) - startDate.toSecsSinceEpoch();
             timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
             datePercent = (float)timeOne/(float)timeTwo;
             weightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
             weightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
 
-            weightPercent = (upperBmrData->at(i).getOutputWeight() - lowWeight) / (highWeight - lowWeight);
-            timeOne = upperBmrData->at(i).getDateTime().toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+            weightPercent = (theDataAnalysis->getUpperBMRWeightAt(i) - lowWeight) / (highWeight - lowWeight);
+            timeOne = theDataAnalysis->getBMRDataSecondsSinceEpoch(i) - startDate.toSecsSinceEpoch();
             timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
             datePercent = (float)timeOne/(float)timeTwo;
             upperWeightX = horizontalBorder + ((width - horizontalBorder) * datePercent);

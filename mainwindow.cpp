@@ -15,8 +15,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     entryWindow->hide();
     newProfile = new NewProfile(this);
     newProfile->hide();
-   // profile = 0;
     profile = new Profile(QString("Matthew"),QDate(1983,9,12),67,1,235,170);
+    theDataAnalysis = new DataAnalysis(profile,listOfEntries);
+    ui->label->setDataAnalysis(theDataAnalysis);
     updateProfile();
 
 
@@ -89,9 +90,10 @@ void MainWindow::updateEntries()
     }
     ui->listWidget->update();
     ui->label->updateVariables();
+    //theDataAnalysis->updateVariables();
     ui->label->update();
-    ui->unnAccCaloriesLabel->setText(QString::number(ui->label->getUnaccountedCalories()));
-    ui->weightRangeLabel->setText(QString::number(floor(ui->label->getWeightRange()*10)/10) + QString(" Lbs"));
+    ui->unnAccCaloriesLabel->setText(QString::number(theDataAnalysis->getUnaccountedForCalories()));
+    ui->weightRangeLabel->setText(QString::number(floor(theDataAnalysis->getWeightRange()*10)/10) + QString(" Lbs"));
 }
 
 void MainWindow::on_actionNew_Profile_triggered()
@@ -236,7 +238,8 @@ void MainWindow::loadFile()
                             j++;
                         }
                         updateEntries();
-                        ui->label->updateVariables();
+                        theDataAnalysis->updateVariables();
+                        //ui->label->updateVariables();
                         entryData->clear();
                         delete entryData;
                         fileLocation += overallSize;
@@ -260,7 +263,7 @@ void MainWindow::loadFile()
 
 void MainWindow::updateProfile()
 {
-    ui->label->setProfile(profile);
+    theDataAnalysis->setProfile(profile);
     ui->nameEditBox->setText(profile->getName());
     ui->initialWeightEditBox->setText(QString::number(profile->getInitialWeight()));
     ui->dobEditBox->setDate(profile->getDob());

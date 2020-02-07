@@ -7,6 +7,7 @@
 #include "entry.h"
 #include "newprofile.h"
 #include "profile.h"
+#include "dataanalysis.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -52,6 +53,7 @@ private:
     AddEntry* entryWindow;
     std::vector<Entry>* listOfEntries;
     NewProfile* newProfile;
+    DataAnalysis* theDataAnalysis;
     bool profileLoaded;
     Profile* profile;
 

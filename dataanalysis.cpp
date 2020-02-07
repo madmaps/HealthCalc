@@ -2,8 +2,38 @@
 
 DataAnalysis::DataAnalysis()
 {
-
+    theProfile = 0;
+    listOfEntries = 0;
+    bmrData = 0;
+    minWeight = 0;
+    maxWeight = 0;
+    unaccountedForCalories = 0;
+    weightRange = 0;
+    averageCaloriesPerDay = 0;
 }
+
+DataAnalysis::DataAnalysis(Profile* inProfile, std::vector<Entry>* inListOfEntries)
+{
+    theProfile = inProfile;
+    listOfEntries = inListOfEntries;
+    bmrData = 0;
+    minWeight = 0;
+    maxWeight = 0;
+    unaccountedForCalories = 0;
+    weightRange = 0;
+    averageCaloriesPerDay = 0;
+}
+
+DataAnalysis::~DataAnalysis()
+{
+    if(bmrData != 0)
+    {
+        bmrData->clear();
+        delete bmrData;
+        bmrData = 0;
+    }
+}
+
 
 void DataAnalysis::setProfile(Profile* inProfile)
 {
@@ -15,15 +45,6 @@ void DataAnalysis::setListOfEntries(std::vector<Entry>* inListOfEntries)
     listOfEntries = inListOfEntries;
 }
 
-std::vector<Entry>* DataAnalysis::getListOfEntries()const
-{
-    return listOfEntries;
-}
-
-Profile* DataAnalysis::getProfile()const
-{
-    return theProfile;
-}
 
 void DataAnalysis::updateVariables()
 {
@@ -53,116 +74,159 @@ int DataAnalysis::getUnaccountedForCalories()const
     return unaccountedForCalories;
 }
 
+unsigned int DataAnalysis::getSizeOfBMRData() const
+{
+    if(bmrData !=0)
+    {
+        return bmrData->size();
+    }
+    return 0;
+}
+
+float DataAnalysis::getLowerBMRWeightAt(unsigned int inIndex) const
+{
+    if(bmrData != 0)
+    {
+        return bmrData->at(inIndex).getOutputWeight();
+    }
+    return 0;
+}
+
+float DataAnalysis::getUpperBMRWeightAt(unsigned int inIndex) const
+{
+    if(bmrData != 0)
+    {
+        return bmrData->at(inIndex).getOutputWeight() + weightRange;
+    }
+    return 0;
+}
+
+qint64 DataAnalysis::getBMRDataSecondsSinceEpoch(unsigned int inIndex) const
+{
+    if(bmrData != 0)
+    {
+        return bmrData->at(inIndex).getDateTime().toSecsSinceEpoch();
+    }
+    return 0;
+}
+
+
+
 void DataAnalysis::updateMaxWeight()
 {
-    maxWeight = 0;
-    for(Entry check : *listOfEntries)
+    if(listOfEntries !=0)
     {
-        if(check.getWeight()>maxWeight)
+        maxWeight = 0;
+        for(Entry check : *listOfEntries)
         {
-            maxWeight = check.getWeight();
+            if(check.getWeight()>maxWeight)
+            {
+                maxWeight = check.getWeight();
+            }
         }
     }
 }
 
 void DataAnalysis::updateMinWeight()
 {
-    minWeight = 999999;
-    for(Entry check : *listOfEntries)
+    if(listOfEntries != 0)
     {
-        if(check.getWeight() < minWeight)
+        minWeight = 999999;
+        for(Entry check : *listOfEntries)
         {
-            minWeight = check.getWeight();
+            if(check.getWeight() < minWeight)
+            {
+                minWeight = check.getWeight();
+            }
         }
     }
-
 }
 
 void DataAnalysis::updateUnaccountedForCalories()
 {
-    const int tryCalorieRange = 1000;
-    float calorieOffset = 0;
-    float lowestDifferenceBetweenHighAndLow = 9999;
-    float tryOffset;
-    for(int k = -tryCalorieRange;k <= tryCalorieRange;k+=5)
+    if(listOfEntries !=0)
     {
-        if(k >= tryCalorieRange - 5)
+        const int tryCalorieRange = 1000;
+        float calorieOffset = 0;
+        float lowestDifferenceBetweenHighAndLow = 9999;
+        float tryOffset;
+        for(int k = -tryCalorieRange;k <= tryCalorieRange;k+=5)
         {
-            tryOffset = calorieOffset;
-            unaccountedForCalories = calorieOffset;
-            weightRange = lowestDifferenceBetweenHighAndLow;
-        }
-        else
-        {
-            tryOffset = k;
-        }
-        if(listOfEntries->size() > 0)
-        {
-            if(bmrData != 0)
+            if(k >= tryCalorieRange)
             {
+                tryOffset = calorieOffset;
+                unaccountedForCalories = calorieOffset;
+                weightRange = lowestDifferenceBetweenHighAndLow;
+            }
+            else
+            {
+                tryOffset = k;
+            }
+            if(listOfEntries->size() > 0)
+            {
+                if(bmrData == 0)
+                {
+                    bmrData = new std::vector<BMRData>;
+                }
                 bmrData->clear();
-                delete bmrData;
-                bmrData = 0;
-            }
-            bmrData = new std::vector<BMRData>;
-            Entry* testEntry = new Entry(listOfEntries->at(0));
-            BMRData firstIn(theProfile,testEntry,0,theProfile->getInitialWeight(),tryOffset);
-            bmrData->push_back(firstIn);
-            unsigned int i = 1;
-            while (i < listOfEntries->size())
-            {
-                bmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),bmrData->at(i-1).getOutputWeight(),tryOffset));
-                i++;
-            }
-
-            float biggestNegativeDifference = 0;
-            i = 0;
-            while(i < listOfEntries->size())
-            {
-                if(listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight() < biggestNegativeDifference)
+                bmrData->push_back(BMRData(theProfile,&listOfEntries->at(0),0,theProfile->getInitialWeight(),tryOffset));
+                unsigned int i = 1;
+                while (i < listOfEntries->size())
                 {
-                    biggestNegativeDifference = listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight();
+                    bmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),bmrData->at(i-1).getOutputWeight(),tryOffset));
+                    i++;
                 }
-                i++;
-            }
 
-            i = 0;
-            while(i < bmrData->size())
-            {
-                bmrData->at(i).shift(biggestNegativeDifference);
-                   i++;
-            }
-
-            float biggestPositiveDifference = 0;
-            i = 0;
-            while(i < listOfEntries->size())
-            {
-                if(listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight() > biggestPositiveDifference)
+                float biggestNegativeDifference = 0;
+                i = 0;
+                while(i < listOfEntries->size())
                 {
-                    biggestPositiveDifference = listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight();
+                    if(listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight() < biggestNegativeDifference)
+                    {
+                        biggestNegativeDifference = listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight();
+                    }
+                    i++;
                 }
-                i++;
-            }
-            if(biggestPositiveDifference < lowestDifferenceBetweenHighAndLow)
-            {
-                lowestDifferenceBetweenHighAndLow = biggestPositiveDifference;
-                calorieOffset = k;
+
+                i = 0;
+                while(i < bmrData->size())
+                {
+                    bmrData->at(i).shift(biggestNegativeDifference);
+                       i++;
+                }
+                float biggestPositiveDifference = 0;
+                i = 0;
+                while(i < listOfEntries->size())
+                {
+                    if(listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight() > biggestPositiveDifference)
+                    {
+                        biggestPositiveDifference = listOfEntries->at(i).getWeight() - bmrData->at(i).getOutputWeight();
+                    }
+                    i++;
+                }
+                if(biggestPositiveDifference < lowestDifferenceBetweenHighAndLow)
+                {
+                    lowestDifferenceBetweenHighAndLow = biggestPositiveDifference;
+                    calorieOffset = k;
+                }
             }
         }
     }
-
 }
 
 void DataAnalysis::updateAverageCaloriesPerDay()
 {
-    unsigned int i = 0;
-    float totalCalories = 0;
-    while(i < listOfEntries->size())
+    if(listOfEntries != 0)
     {
-        totalCalories += listOfEntries->at(i).getCaloriesConsumed() - listOfEntries->at(i).getCaloriesBurned();
-        i++;
+        unsigned int i = 0;
+        float totalCalories = 0;
+        while(i < listOfEntries->size())
+        {
+            totalCalories += listOfEntries->at(i).getCaloriesConsumed() - listOfEntries->at(i).getCaloriesBurned();
+            i++;
+        }
+        float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
+        averageCaloriesPerDay = totalCalories / totalDays;
+        averageCaloriesPerDay += unaccountedForCalories;
     }
-    float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
-    averageCaloriesPerDay = totalCalories / totalDays;
-    averageCaloriesPerDay += unaccountedForCalories;
 }

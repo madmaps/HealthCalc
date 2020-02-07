@@ -9,15 +9,19 @@ class DataAnalysis
 {
 public:
     DataAnalysis();
+    DataAnalysis(Profile* inProfile, std::vector<Entry>* inListOfEntries);
+    ~DataAnalysis();
     void setProfile(Profile* inProfile);
     void setListOfEntries(std::vector<Entry>* inListOfEntries);
-    std::vector<Entry>* getListOfEntries()const;
-    Profile* getProfile()const;
     void updateVariables();
     float getWeightRange()const;
     float getMinWeight()const;
     float getMaxWeight()const;
     int getUnaccountedForCalories()const;
+    unsigned int getSizeOfBMRData() const;
+    float getLowerBMRWeightAt(unsigned int inIndex) const;
+    float getUpperBMRWeightAt(unsigned int inIndex) const;
+    qint64 getBMRDataSecondsSinceEpoch(unsigned int inIndex) const;
 
 private:
     void updateMaxWeight();

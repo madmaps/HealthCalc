@@ -4,7 +4,7 @@
 #include <QDate>
 #include "entry.h"
 #include "bmrdata.h"
-#include "profile.h"
+#include "dataanalysis.h"
 
 
 
@@ -15,8 +15,7 @@ public:
     explicit Graph(QWidget* parent = 0);
 
     void setListOfEntries(std::vector<Entry>* inListOfEntries);
-    void setProfile(Profile* inProfile);
-
+    void setDataAnalysis(DataAnalysis* inDataAnalysis);
     void updateVariables();
     int getUnaccountedCalories()const;
     float getWeightRange()const;
@@ -26,9 +25,7 @@ protected:
 
 private:
     std::vector<Entry>* listOfEntries;
-    Profile* theProfile;
-    std::vector<BMRData>* lowerBmrData;
-    std::vector<BMRData>* upperBmrData;
+    DataAnalysis* theDataAnalysis;
     QDateTime startDate;
     QDateTime endDate;
     bool autoDate;
@@ -36,8 +33,6 @@ private:
     float highWeight;
     bool autoWeight;
     float minWeight, maxWeight;
-    int unaccountedForCalories;
-    float range;
 };
 
 #endif // GRAPH_H

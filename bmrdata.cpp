@@ -47,14 +47,14 @@ void BMRData::calculateOutputWeight()
     if(thePreviousEntry != 0)
     {
 
-        caloriesPerDay = (float)(theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned()) / (float)((float)(theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
+        caloriesPerDay = (float)((int)theEntry->getCaloriesConsumed() - (int)theEntry->getCaloriesBurned()) / (float)((float)(theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
         caloriesPerDay += otherCalories;
         outputWeight = initialWeight - ((float)(BMR - caloriesPerDay) / 3500) * ((float)(theEntry->getDateTime().toSecsSinceEpoch() - thePreviousEntry->getDateTime().toSecsSinceEpoch()) / 86400);
 
     }
     else
     {
-        caloriesPerDay = theEntry->getCaloriesConsumed() - theEntry->getCaloriesBurned();
+        caloriesPerDay = (int)theEntry->getCaloriesConsumed() - (int)theEntry->getCaloriesBurned();
         caloriesPerDay += otherCalories;
         outputWeight = initialWeight - (float)(BMR - caloriesPerDay) / 3500;
 
