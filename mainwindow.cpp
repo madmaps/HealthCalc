@@ -293,3 +293,10 @@ void MainWindow::on_actionOpen_Projile_triggered()
 {
     loadFile();
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    profile->setTargetWeight(ui->targetWeightEditBox->text().toFloat());
+    QDate predictionTargetDate = theDataAnalysis->getDateOfGoal();
+    ui->estDateWeightLossLabel->setText(predictionTargetDate.toString());
+}

@@ -38,6 +38,8 @@ private slots:
 
     void on_actionOpen_Projile_triggered();
 
+    void on_pushButton_clicked();
+
 private:
     void updateEntries();
 

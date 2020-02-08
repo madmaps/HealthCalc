@@ -29,14 +29,14 @@ void BMRData::shift(float inAmount)
 
 void BMRData::calculateBMR()
 {
-    unsigned int age = (float)theProfile->getDob().daysTo(theEntry->getDateTime().date()) / 365;
+    float age = (float)theProfile->getDob().daysTo(theEntry->getDateTime().date()) / 365;
     if(theProfile->getGender())
     {
-        BMR = 66 + (6.3 * initialWeight) + (12.9 * theProfile->getHeight()) - (6.8 * age);
+        BMR = 66 + (6.3 * initialWeight) + (12.9 * (float)theProfile->getHeight()) - (6.8 * age);
     }
     else
     {
-        BMR = 655 + (4.3 * initialWeight) + (4.7 * theProfile->getHeight()) - (4.7 * age);
+        BMR = 655 + (4.3 * initialWeight) + (4.7 * (float)theProfile->getHeight()) - (4.7 * age);
     }
     BMR *= 1.2;
 }

@@ -19,6 +19,7 @@ public:
     bool getGender()const;
     float getInitialWeight() const;
     float getTargetWeight() const;
+    void setTargetWeight(const float& inTargetWeight);
 
     std::vector<char>* saveToFile() const;
 

@@ -134,6 +134,11 @@ float Profile::getTargetWeight()const
     return targetWeight;
 }
 
+void Profile::setTargetWeight(const float &inTargetWeight)
+{
+    targetWeight = inTargetWeight;
+}
+
 std::vector<char>* Profile::saveToFile()const
 {
     char* returnData = new char[16];
