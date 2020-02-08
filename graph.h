@@ -17,8 +17,12 @@ public:
     void setListOfEntries(std::vector<Entry>* inListOfEntries);
     void setDataAnalysis(DataAnalysis* inDataAnalysis);
     void updateVariables();
-    int getUnaccountedCalories()const;
-    float getWeightRange()const;
+    void setAutoDate(const bool& inAutoDate);
+    void setAutoWeight(const bool& inAutoWeight);
+    void setStartDate(const QDate& inDate);
+    void setEndDate(const QDate& inDate);
+    void setlowWeight(const float& inLowWeight);
+    void setHighWeight(const float& inHighWeight);
 
 protected:
     void paintEvent(QPaintEvent*);

@@ -64,15 +64,48 @@ void Graph::updateVariables()
     theDataAnalysis->updateVariables();
 }
 
-int Graph::getUnaccountedCalories() const
+void Graph::setAutoDate(const bool &inAutoDate)
 {
-    return 0;//unaccountedForCalories;
+    autoDate = inAutoDate;
 }
 
-float Graph::getWeightRange() const
+void Graph::setAutoWeight(const bool &inAutoWeight)
 {
-    return 0;//range;
+    autoWeight = inAutoWeight;
 }
+
+void Graph::setStartDate(const QDate& inDate)
+{
+    if(!autoDate)
+    {
+        startDate = QDateTime(QDate(inDate));
+    }
+}
+
+void Graph::setEndDate(const QDate& inDate)
+{
+    if(!autoDate)
+    {
+        endDate = QDateTime(QDate(inDate));
+    }
+}
+
+void Graph::setlowWeight(const float& inLowWeight)
+{
+    if(!autoWeight)
+    {
+        lowWeight = inLowWeight;
+    }
+}
+
+void Graph::setHighWeight(const float& inHighWeight)
+{
+    if(!autoWeight)
+    {
+        highWeight = inHighWeight;
+    }
+}
+
 
 void Graph::paintEvent(QPaintEvent*)
 {

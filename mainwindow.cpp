@@ -300,3 +300,9 @@ void MainWindow::on_pushButton_clicked()
     QDate predictionTargetDate = theDataAnalysis->getDateOfGoal();
     ui->estDateWeightLossLabel->setText(predictionTargetDate.toString());
 }
+
+void MainWindow::on_updateGraphButton_clicked()
+{
+    ui->label->updateVariables();
+    ui->label->update();
+}
