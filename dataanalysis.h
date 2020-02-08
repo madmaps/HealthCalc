@@ -22,7 +22,10 @@ public:
     float getLowerBMRWeightAt(unsigned int inIndex) const;
     float getUpperBMRWeightAt(unsigned int inIndex) const;
     qint64 getBMRDataSecondsSinceEpoch(unsigned int inIndex) const;
-
+    QDate getDateOfGoal() const;
+    float getPredictedWeight(const QDateTime& inDateTime, float inPreviousWeight, int inCalories) const;
+    float getEstimatedFatBurned()const;
+    int getAverageCaloriesPerDay() const;
 private:
     void updateMaxWeight();
     void updateMinWeight();

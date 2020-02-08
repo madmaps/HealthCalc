@@ -274,7 +274,7 @@
            <item>
             <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>Estimated Date to Target Weight:</string>
+              <string>Target Date:</string>
              </property>
             </widget>
            </item>
@@ -292,7 +292,7 @@
            <item>
             <widget class="QLabel" name="label_6">
              <property name="text">
-              <string>Estimated Fat Burned:</string>
+              <string>Fat Burned:</string>
              </property>
             </widget>
            </item>

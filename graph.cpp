@@ -61,108 +61,6 @@ void Graph::updateVariables()
     endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
     endDate = QDateTime(endDate.date().addDays(1));
 
-    /*float calorieOffset = 0;
-    float lowestDifferenceBetweenHighAndLow = 9999;
-    float tryOffset;
-    for(int k = -1000;k <= 1000;k+=5)
-    {
-        if(k >= 995)
-        {
-            tryOffset = calorieOffset;
-            unaccountedForCalories = calorieOffset;
-            range = lowestDifferenceBetweenHighAndLow;
-        }
-        else
-        {
-            tryOffset = k;
-        }
-        if(listOfEntries->size() > 0)
-        {
-            if(lowerBmrData != 0)
-            {
-                lowerBmrData->clear();
-                upperBmrData->clear();
-                delete lowerBmrData;
-                delete upperBmrData;
-                lowerBmrData = 0;
-                upperBmrData = 0;
-            }
-            lowerBmrData = new std::vector<BMRData>;
-            upperBmrData = new std::vector<BMRData>;
-            Entry* testEntry = new Entry(listOfEntries->at(0));
-            BMRData firstIn(theProfile,testEntry,0,theProfile->getInitialWeight(),tryOffset);
-            lowerBmrData->push_back(firstIn);
-            upperBmrData->push_back(firstIn);
-
-            unsigned int i = 1;
-            while (i < listOfEntries->size())
-            {
-                lowerBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight(),tryOffset));
-                upperBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight(),tryOffset));
-                i++;
-            }
-
-
-            float biggestNegativeDifference = 0;
-            i = 0;
-            while(i < listOfEntries->size())
-            {
-                if(listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight() < biggestNegativeDifference)
-                {
-                    biggestNegativeDifference = listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight();
-                }
-                i++;
-            }
-
-            i = 0;
-            while(i < lowerBmrData->size())
-            {
-                lowerBmrData->at(i).shift(biggestNegativeDifference);
-                upperBmrData->at(i).shift(biggestNegativeDifference);
-                i++;
-            }
-
-            float biggestPositiveDifference = 0;
-            i = 0;
-            while(i < listOfEntries->size())
-            {
-                if(listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight() > biggestPositiveDifference)
-                {
-                    biggestPositiveDifference = listOfEntries->at(i).getWeight() - lowerBmrData->at(i).getOutputWeight();
-                }
-                i++;
-            }
-            if(biggestPositiveDifference < lowestDifferenceBetweenHighAndLow)
-            {
-                lowestDifferenceBetweenHighAndLow = biggestPositiveDifference;
-                calorieOffset = k;
-            }
-            i=0;
-            while(i < upperBmrData->size())
-            {
-                upperBmrData->at(i).shift(biggestPositiveDifference);
-                i++;
-            }
-
-        }
-    }
-    //get average calories burned per day
-    unsigned int i = 0;
-    float totalCalories = 0;
-    while(i < listOfEntries->size())
-    {
-        totalCalories += listOfEntries->at(i).getCaloriesConsumed() - listOfEntries->at(i).getCaloriesBurned();
-        i++;
-    }
-    float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
-    float averageCaloriesADay = totalCalories / totalDays;
-    averageCaloriesADay += unaccountedForCalories;
-    i = 0;
-    /*while(i < 200)
-    {
-        upperBmrData->push_back(BMRData(theProfile,&listOfEntries->at(i),&listOfEntries->at(i-1),lowerBmrData->at(i-1).getOutputWeight(),tryOffset));
-        i++;
-    }*/
     theDataAnalysis->updateVariables();
 }
 
@@ -283,7 +181,8 @@ void Graph::paintEvent(QPaintEvent*)
         int upperWeightX, upperWeightY;
         int oldUpperWeightX, oldUpperWeightY;
         QPointF points[4];
-        thePen.setWidth(-1);
+        thePen.setWidth(1);
+        thePen.setStyle(Qt::NoPen);
         theColor.setRgb(255,150,34,70);
         theBrush.setColor(theColor);
         theBrush.setStyle(Qt::SolidPattern);
@@ -331,6 +230,68 @@ void Graph::paintEvent(QPaintEvent*)
 
             }
             i++;
+        }
+        //Draw Prediction Lines
+        if(listOfEntries->size() > 0)
+        {
+            thePen.setWidth(1);
+            thePen.setStyle(Qt::NoPen);
+            theColor.setRgb(255,244,111,180);
+            theBrush.setColor(theColor);
+            theBrush.setStyle(Qt::SolidPattern);
+            thePen.setColor(theColor);
+            theColor.setRgb(255,244,111);
+            secondPen.setColor(theColor);
+            secondPen.setWidth(5);
+            QDateTime predictionDateTime = listOfEntries->at(listOfEntries->size()-1).getDateTime();
+            float predictionWeight = theDataAnalysis->getLowerBMRWeightAt(theDataAnalysis->getSizeOfBMRData()-1);
+            if(theDataAnalysis != 0)
+            {
+                if(theDataAnalysis->getSizeOfBMRData() > 3)
+                {
+                    for(unsigned int i = 0;i <= 20; i++)
+                    {
+                        if(i > 0)
+                        {
+                            oldWeightX = weightX;
+                            oldWeightY = weightY;
+                            oldUpperWeightX = upperWeightX;
+                            oldUpperWeightY = upperWeightY;
+                        }
+                        weightPercent = (predictionWeight - lowWeight) / (highWeight - lowWeight);
+                        timeOne = predictionDateTime.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+                        timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+                        datePercent = (float)timeOne/(float)timeTwo;
+                        weightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
+                        weightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
+
+                        weightPercent = (predictionWeight + theDataAnalysis->getWeightRange() - lowWeight) / (highWeight - lowWeight);
+                        timeOne = predictionDateTime.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+                        timeTwo = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+                        datePercent = (float)timeOne/(float)timeTwo;
+                        upperWeightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
+                        upperWeightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
+
+                        if(i > 0)
+                        {
+                            painter.setPen(thePen);
+                            painter.setBrush(theBrush);
+                            points[0] = QPointF(oldWeightX,oldWeightY);
+                            points[1] = QPointF(weightX,weightY);
+                            points[2] = QPointF(upperWeightX,upperWeightY);
+                            points[3] = QPointF(oldUpperWeightX,oldUpperWeightY);
+                            painter.drawPolygon(points,4);
+                            painter.setPen(secondPen);
+                            painter.drawLine(oldWeightX, oldWeightY, weightX, weightY);
+                            painter.drawLine(oldUpperWeightX,oldUpperWeightY,upperWeightX,upperWeightY);
+
+
+                        }
+                        predictionWeight = theDataAnalysis->getPredictedWeight(predictionDateTime,predictionWeight,theDataAnalysis->getAverageCaloriesPerDay());
+                        predictionDateTime = QDateTime::fromSecsSinceEpoch(predictionDateTime.toSecsSinceEpoch() + (60 * 60 * 24));
+                    }
+                }
+            }
         }
     }
 

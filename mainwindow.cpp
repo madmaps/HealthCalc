@@ -94,6 +94,9 @@ void MainWindow::updateEntries()
     ui->label->update();
     ui->unnAccCaloriesLabel->setText(QString::number(theDataAnalysis->getUnaccountedForCalories()));
     ui->weightRangeLabel->setText(QString::number(floor(theDataAnalysis->getWeightRange()*10)/10) + QString(" Lbs"));
+    QDate predictionTargetDate = theDataAnalysis->getDateOfGoal();
+    ui->estDateWeightLossLabel->setText(predictionTargetDate.toString());
+    ui->estFatBurnedLabel->setText(QString::number(floor(theDataAnalysis->getEstimatedFatBurned()*10)/10) + QString(" Lbs"));
 }
 
 void MainWindow::on_actionNew_Profile_triggered()

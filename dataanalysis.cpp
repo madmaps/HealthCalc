@@ -74,6 +74,11 @@ int DataAnalysis::getUnaccountedForCalories()const
     return unaccountedForCalories;
 }
 
+int DataAnalysis::getAverageCaloriesPerDay() const
+{
+    return averageCaloriesPerDay;
+}
+
 unsigned int DataAnalysis::getSizeOfBMRData() const
 {
     if(bmrData !=0)
@@ -110,7 +115,47 @@ qint64 DataAnalysis::getBMRDataSecondsSinceEpoch(unsigned int inIndex) const
     return 0;
 }
 
+QDate DataAnalysis::getDateOfGoal() const
+{
+    QDateTime returnDate;
+    bool found = false;
+    QDateTime predictionDate = listOfEntries->at(listOfEntries->size()-1).getDateTime();
+    float predictionWeight = bmrData->at(bmrData->size()-1).getOutputWeight();
+    for(unsigned int i = 0; i <= (365 * 3) && !found; i++)
+    {
+        predictionDate = QDateTime::fromSecsSinceEpoch(predictionDate.toSecsSinceEpoch() + (60 * 60 * 24));
+        predictionWeight = getPredictedWeight(predictionDate,predictionWeight,averageCaloriesPerDay);
+        if(predictionWeight + weightRange < theProfile->getTargetWeight() && !found)
+        {
+            found = true;
+            returnDate = predictionDate;
+        }
+    }
+    return returnDate.date();
+}
 
+float DataAnalysis::getEstimatedFatBurned()const
+{
+    return bmrData->at(0).getOutputWeight() - bmrData->at(bmrData->size()-1).getOutputWeight();
+}
+
+
+float DataAnalysis::getPredictedWeight(const QDateTime &inDateTime, float inPreviousWeight, int inCalories) const
+{
+    float BMR = 0;
+    int age = (float)theProfile->getDob().daysTo(inDateTime.date()) / 365;
+    if(theProfile->getGender())
+    {
+        BMR = 66 + (6.3 * inPreviousWeight) + (12.9 * (float)theProfile->getHeight()) - (6.8 * (float)age);
+    }
+    else
+    {
+        BMR = 655 + (4.3 * inPreviousWeight) + (4.7 * (float)theProfile->getHeight()) - (4.7 * (float)age);
+    }
+    BMR *= 1.2;
+    float outputWeight = inPreviousWeight - (float)(BMR - inCalories) / 3500;
+    return outputWeight;
+}
 
 void DataAnalysis::updateMaxWeight()
 {
@@ -222,7 +267,7 @@ void DataAnalysis::updateAverageCaloriesPerDay()
         float totalCalories = 0;
         while(i < listOfEntries->size())
         {
-            totalCalories += listOfEntries->at(i).getCaloriesConsumed() - listOfEntries->at(i).getCaloriesBurned();
+            totalCalories += (int)listOfEntries->at(i).getCaloriesConsumed() - (int)listOfEntries->at(i).getCaloriesBurned();
             i++;
         }
         float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
