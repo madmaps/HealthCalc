@@ -23,6 +23,10 @@ public:
     void setEndDate(const QDate& inDate);
     void setlowWeight(const float& inLowWeight);
     void setHighWeight(const float& inHighWeight);
+    void setShowPrediction(const bool& inShowPrediction);
+    void setShowWeightRange(const bool& inShowWeightRange);
+    void setShowTargetWeight(const bool& inShowTargetWeight);
+
 
 protected:
     void paintEvent(QPaintEvent*);
@@ -37,6 +41,9 @@ private:
     float highWeight;
     bool autoWeight;
     float minWeight, maxWeight;
+    bool showPrediction;
+    bool showWeightRange;
+    bool showTargetWeight;
 };
 
 #endif // GRAPH_H

@@ -21,45 +21,51 @@ void Graph::setDataAnalysis(DataAnalysis *inDataAnalysis)
 void Graph::updateVariables()
 {
     //Finding max weight
-    maxWeight = 0;
-    for(Entry check : *listOfEntries)
+    if(autoWeight)
     {
-        if(check.getWeight()>maxWeight)
+        maxWeight = 0;
+        for(Entry check : *listOfEntries)
         {
-            maxWeight = check.getWeight();
+            if(check.getWeight()>maxWeight)
+            {
+                maxWeight = check.getWeight();
+            }
         }
-    }
 
-    //Finding min weight
-    minWeight = 999999;
-    for(Entry check : *listOfEntries)
-    {
-        if(check.getWeight() < minWeight)
+        //Finding min weight
+        minWeight = 999999;
+        for(Entry check : *listOfEntries)
         {
-            minWeight = check.getWeight();
+            if(check.getWeight() < minWeight)
+            {
+                minWeight = check.getWeight();
+            }
         }
-    }
 
-    float weightRange = maxWeight - minWeight;
-    if(weightRange < 5)
+        float weightRange = maxWeight - minWeight;
+        if(weightRange < 5)
+        {
+            weightRange = 5;
+        }
+
+        highWeight = maxWeight + (weightRange * 0.20);
+        lowWeight = maxWeight - weightRange - (weightRange * 0.30);
+    }
+    if(autoDate)
     {
-        weightRange = 5;
-    }
+        startDate = listOfEntries->at(0).getDateTime();
+        startDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
+        qint64 secondsFromBegToEnd = listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch();
 
-    highWeight = maxWeight + (weightRange * 0.20);
-    lowWeight = maxWeight - weightRange - (weightRange * 0.30);
-    startDate = listOfEntries->at(0).getDateTime();
-    startDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
-    qint64 secondsFromBegToEnd = listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch();
-
-    // If less than 5 days make it 5 days
-    if(secondsFromBegToEnd < 432000)
-    {
-        secondsFromBegToEnd = 432000;
+        // If less than 5 days make it 5 days
+        if(secondsFromBegToEnd < 432000)
+        {
+            secondsFromBegToEnd = 432000;
+        }
+        endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 0.30));
+        endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
+        endDate = QDateTime(endDate.date().addDays(1));
     }
-    endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 0.30));
-    endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
-    endDate = QDateTime(endDate.date().addDays(1));
 
     theDataAnalysis->updateVariables();
 }
@@ -105,6 +111,22 @@ void Graph::setHighWeight(const float& inHighWeight)
         highWeight = inHighWeight;
     }
 }
+
+void Graph::setShowPrediction(const bool& inShowPrediction)
+{
+    showPrediction = inShowPrediction;
+}
+
+void Graph::setShowWeightRange(const bool& inShowWeightRange)
+{
+    showWeightRange = inShowWeightRange;
+}
+
+void Graph::setShowTargetWeight(const bool& inShowTargetWeight)
+{
+    showTargetWeight = inShowTargetWeight;
+}
+
 
 
 void Graph::paintEvent(QPaintEvent*)
@@ -208,7 +230,6 @@ void Graph::paintEvent(QPaintEvent*)
     }
 
     //Draw Prediction points
-
     if(theDataAnalysis != 0)
     {
         int upperWeightX, upperWeightY;
@@ -247,7 +268,7 @@ void Graph::paintEvent(QPaintEvent*)
             upperWeightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
             upperWeightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
 
-            if(i > 0)
+            if(i > 0 && showWeightRange)
             {
                 painter.setPen(thePen);
                 painter.setBrush(theBrush);
@@ -280,9 +301,9 @@ void Graph::paintEvent(QPaintEvent*)
             float predictionWeight = theDataAnalysis->getLowerBMRWeightAt(theDataAnalysis->getSizeOfBMRData()-1);
             if(theDataAnalysis != 0)
             {
-                if(theDataAnalysis->getSizeOfBMRData() > 3)
+                if(theDataAnalysis->getSizeOfBMRData() > 3 && showPrediction)
                 {
-                    for(unsigned int i = 0;i <= 20; i++)
+                    for(unsigned int i = 0;i <= 365; i++)
                     {
                         if(i > 0)
                         {
@@ -327,14 +348,21 @@ void Graph::paintEvent(QPaintEvent*)
             }
         }
     }
-
+    //Draw white box for dates
+    theColor.setRgb(255,255,255);
+    thePen.setColor(theColor);
+    theBrush.setColor(theColor);
+    theBrush.setStyle(Qt::SolidPattern);
+    painter.setPen(thePen);
+    painter.setBrush(theBrush);
+    painter.drawRect(0,height - verticalBorder + 3,width,height);
     //Draw date lines
     theColor.setRgb(22,45,245);
     thePen.setColor(theColor);
     thePen.setWidth(1);
     thePen.setStyle(Qt::SolidLine);
     secondPen.setStyle(Qt::DotLine);
-    secondPen.setWidth(5);
+    secondPen.setWidth(3);
     theColor.setRgb(22,45,245,50);
     secondPen.setColor(theColor);
     painter.setPen(thePen);
@@ -371,7 +399,7 @@ void Graph::paintEvent(QPaintEvent*)
     thePen.setWidth(1);
     thePen.setStyle(Qt::SolidLine);
     secondPen.setStyle(Qt::DotLine);
-    secondPen.setWidth(5);
+    secondPen.setWidth(3);
     theColor.setRgb(249,117,126,50);
     secondPen.setColor(theColor);
     painter.setPen(thePen);
@@ -399,6 +427,26 @@ void Graph::paintEvent(QPaintEvent*)
         }
         i++;
     }
+
+    //Draw Target Line
+    if(showTargetWeight)
+    {
+        theColor.setRgb(113,255,45);
+        thePen.setColor(theColor);
+        thePen.setStyle(Qt::DotLine);
+        thePen.setWidth(3);
+        painter.setPen(thePen);
+        float targetWeight = theDataAnalysis->getTargetWeight();
+        weightPercent = (targetWeight - lowWeight) / (highWeight - lowWeight);
+        if(weightPercent >=0)
+        {
+            weightLocationY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
+            painter.drawLine(horizontalBorder, weightLocationY, width, weightLocationY);
+        }
+
+    }
+
+
 
 
 

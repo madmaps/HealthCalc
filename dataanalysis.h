@@ -26,6 +26,7 @@ public:
     float getPredictedWeight(const QDateTime& inDateTime, float inPreviousWeight, int inCalories) const;
     float getEstimatedFatBurned()const;
     int getAverageCaloriesPerDay() const;
+    float getTargetWeight() const;
 private:
     void updateMaxWeight();
     void updateMinWeight();

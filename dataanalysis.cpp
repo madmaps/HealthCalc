@@ -115,6 +115,11 @@ qint64 DataAnalysis::getBMRDataSecondsSinceEpoch(unsigned int inIndex) const
     return 0;
 }
 
+float DataAnalysis::getTargetWeight() const
+{
+    return theProfile->getTargetWeight();
+}
+
 QDate DataAnalysis::getDateOfGoal() const
 {
     QDateTime returnDate;
