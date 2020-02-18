@@ -56,7 +56,8 @@ void MainWindow::gettingNewProfile(Profile inProfile)
     }
     profile = new Profile(inProfile);
     updateProfile();
-
+    listOfEntries->clear();
+    updateEntries();
 }
 
 void MainWindow::on_newEntryButton_clicked()
@@ -96,7 +97,6 @@ void MainWindow::updateEntries()
     }
     ui->listWidget->update();
     ui->label->updateVariables();
-    //theDataAnalysis->updateVariables();
     ui->label->update();
     ui->unnAccCaloriesLabel->setText(QString::number(theDataAnalysis->getUnaccountedForCalories()));
     ui->weightRangeLabel->setText(QString::number(floor(theDataAnalysis->getWeightRange()*10)/10) + QString(" Lbs"));

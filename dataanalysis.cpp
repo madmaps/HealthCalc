@@ -123,17 +123,23 @@ float DataAnalysis::getTargetWeight() const
 QDate DataAnalysis::getDateOfGoal() const
 {
     QDateTime returnDate;
-    bool found = false;
-    QDateTime predictionDate = listOfEntries->at(listOfEntries->size()-1).getDateTime();
-    float predictionWeight = bmrData->at(bmrData->size()-1).getOutputWeight();
-    for(unsigned int i = 0; i <= (365 * 3) && !found; i++)
+    if(listOfEntries != 0)
     {
-        predictionDate = QDateTime::fromSecsSinceEpoch(predictionDate.toSecsSinceEpoch() + (60 * 60 * 24));
-        predictionWeight = getPredictedWeight(predictionDate,predictionWeight,averageCaloriesPerDay);
-        if(predictionWeight + weightRange < theProfile->getTargetWeight() && !found)
+        if(listOfEntries->size() > 3)
         {
-            found = true;
-            returnDate = predictionDate;
+            bool found = false;
+            QDateTime predictionDate = listOfEntries->at(listOfEntries->size()-1).getDateTime();
+            float predictionWeight = bmrData->at(bmrData->size()-1).getOutputWeight();
+            for(unsigned int i = 0; i <= (365 * 3) && !found; i++)
+            {
+                predictionDate = QDateTime::fromSecsSinceEpoch(predictionDate.toSecsSinceEpoch() + (60 * 60 * 24));
+                predictionWeight = getPredictedWeight(predictionDate,predictionWeight,averageCaloriesPerDay);
+                if(predictionWeight + weightRange < theProfile->getTargetWeight() && !found)
+                {
+                    found = true;
+                    returnDate = predictionDate;
+                }
+            }
         }
     }
     return returnDate.date();
@@ -141,7 +147,14 @@ QDate DataAnalysis::getDateOfGoal() const
 
 float DataAnalysis::getEstimatedFatBurned()const
 {
-    return bmrData->at(0).getOutputWeight() - bmrData->at(bmrData->size()-1).getOutputWeight();
+    if(bmrData != 0)
+    {
+        if(bmrData->size() > 0)
+        {
+            return bmrData->at(0).getOutputWeight() - bmrData->at(bmrData->size()-1).getOutputWeight();
+        }
+    }
+    return 0;
 }
 
 
@@ -196,24 +209,24 @@ void DataAnalysis::updateUnaccountedForCalories()
 {
     if(listOfEntries !=0)
     {
-        const int tryCalorieRange = 1000;
-        float calorieOffset = 0;
-        float lowestDifferenceBetweenHighAndLow = 9999;
-        float tryOffset;
-        for(int k = -tryCalorieRange;k <= tryCalorieRange;k+=5)
+        if(listOfEntries->size() > 0)
         {
-            if(k >= tryCalorieRange)
+            const int tryCalorieRange = 1000;
+            float calorieOffset = 0;
+            float lowestDifferenceBetweenHighAndLow = 9999;
+            float tryOffset;
+            for(int k = -tryCalorieRange;k <= tryCalorieRange;k+=5)
             {
-                tryOffset = calorieOffset;
-                unaccountedForCalories = calorieOffset;
-                weightRange = lowestDifferenceBetweenHighAndLow;
-            }
-            else
-            {
-                tryOffset = k;
-            }
-            if(listOfEntries->size() > 0)
-            {
+                if(k >= tryCalorieRange)
+                {
+                    tryOffset = calorieOffset;
+                    unaccountedForCalories = calorieOffset;
+                    weightRange = lowestDifferenceBetweenHighAndLow;
+                }
+                else
+                {
+                    tryOffset = k;
+                }
                 if(bmrData == 0)
                 {
                     bmrData = new std::vector<BMRData>;
@@ -268,15 +281,18 @@ void DataAnalysis::updateAverageCaloriesPerDay()
 {
     if(listOfEntries != 0)
     {
-        unsigned int i = 0;
-        float totalCalories = 0;
-        while(i < listOfEntries->size())
+        if(listOfEntries->size() > 1)
         {
-            totalCalories += (int)listOfEntries->at(i).getCaloriesConsumed() - (int)listOfEntries->at(i).getCaloriesBurned();
-            i++;
+            unsigned int i = 0;
+            float totalCalories = 0;
+            while(i < listOfEntries->size())
+            {
+                totalCalories += (int)listOfEntries->at(i).getCaloriesConsumed() - (int)listOfEntries->at(i).getCaloriesBurned();
+                i++;
+            }
+            float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
+            averageCaloriesPerDay = totalCalories / totalDays;
+            averageCaloriesPerDay += unaccountedForCalories;
         }
-        float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
-        averageCaloriesPerDay = totalCalories / totalDays;
-        averageCaloriesPerDay += unaccountedForCalories;
     }
 }

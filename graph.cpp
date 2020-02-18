@@ -4,7 +4,8 @@
 
 Graph::Graph(QWidget* parent) : QLabel(parent)
 {
-    //lowerBmrData = 0;
+    horizontalBorder = 35;
+    verticalBorder = 60;
 }
 
 void Graph::setListOfEntries(std::vector<Entry>* inListOfEntries)
@@ -49,9 +50,9 @@ void Graph::updateVariables()
         }
 
         highWeight = maxWeight + (weightRange * 0.20);
-        lowWeight = maxWeight - weightRange - (weightRange * 0.30);
+        lowWeight = maxWeight - weightRange - (weightRange * 1.0);
     }
-    if(autoDate)
+    if(autoDate && listOfEntries->size() > 0)
     {
         startDate = listOfEntries->at(0).getDateTime();
         startDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
@@ -62,7 +63,7 @@ void Graph::updateVariables()
         {
             secondsFromBegToEnd = 432000;
         }
-        endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 0.30));
+        endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 1.0));
         endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
         endDate = QDateTime(endDate.date().addDays(1));
     }
@@ -131,8 +132,8 @@ void Graph::setShowTargetWeight(const bool& inShowTargetWeight)
 
 void Graph::paintEvent(QPaintEvent*)
 {
-    const int horizontalBorder = 35;
-    const int verticalBorder = 60;
+    //const int horizontalBorder = 35;
+    //const int verticalBorder = 60;
     const int gridSize = 20;
     const int labelHeight = 20;
 
@@ -268,7 +269,7 @@ void Graph::paintEvent(QPaintEvent*)
             upperWeightX = horizontalBorder + ((width - horizontalBorder) * datePercent);
             upperWeightY = (height - verticalBorder) - ((height - verticalBorder) * weightPercent);
 
-            if(i > 0 && showWeightRange)
+            if(i > 0 && showWeightRange && listOfEntries->size() > 2)
             {
                 painter.setPen(thePen);
                 painter.setBrush(theBrush);
@@ -446,10 +447,6 @@ void Graph::paintEvent(QPaintEvent*)
 
     }
 
-
-
-
-
     //Redraw black border
     thePen.setWidth(1);
     thePen.setStyle(Qt::SolidLine);
@@ -462,3 +459,76 @@ void Graph::paintEvent(QPaintEvent*)
     painter.setBrush(theBrush);
     painter.drawRect(0,0,width-1,height-1);
 }
+
+void Graph::mousePressEvent(QMouseEvent *ev)
+{
+    if(ev->button() == Qt::LeftButton)
+    {
+
+        mouseDown = true;
+        previousMouseDownX = ev->x();
+        previousMouseDownY = ev->y();
+    }
+}
+
+void Graph::mouseReleaseEvent(QMouseEvent *ev)
+{
+    if(ev->button() == Qt::LeftButton)
+    {
+        mouseDown = false;
+    }
+}
+
+void Graph::mouseMoveEvent(QMouseEvent *ev)
+{
+    if(mouseDown)
+    {
+        float differenceY = (highWeight - lowWeight) / (this->height() - verticalBorder);
+        float differenceX = (endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch()) / (this->width() - horizontalBorder);
+        int movedY = ev->y() - previousMouseDownY;
+        int movedX = ev->x() - previousMouseDownX;
+        previousMouseDownY = ev->y();
+        previousMouseDownX = ev->x();
+        lowWeight += movedY * differenceY;
+        highWeight += movedY * differenceY;
+        endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() - (movedX * differenceX));
+        startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() - (movedX * differenceX));
+        update();
+    }
+}
+
+void Graph::wheelEvent(QWheelEvent *ev)
+{
+    float angle = ev->angleDelta().ry();
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

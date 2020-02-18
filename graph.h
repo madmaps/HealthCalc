@@ -2,6 +2,8 @@
 #define GRAPH_H
 #include <QLabel>
 #include <QDate>
+#include <QMouseEvent>
+#include <QWheelEvent>
 #include "entry.h"
 #include "bmrdata.h"
 #include "dataanalysis.h"
@@ -29,7 +31,15 @@ public:
 
 
 protected:
-    void paintEvent(QPaintEvent*);
+    void paintEvent(QPaintEvent*) override;
+
+    void mousePressEvent(QMouseEvent *ev) override;
+
+    void mouseReleaseEvent(QMouseEvent *ev) override;
+
+    void mouseMoveEvent(QMouseEvent *ev) override;
+
+    void wheelEvent(QWheelEvent *ev) override;
 
 private:
     std::vector<Entry>* listOfEntries;
@@ -44,6 +54,11 @@ private:
     bool showPrediction;
     bool showWeightRange;
     bool showTargetWeight;
+    bool mouseDown;
+    int previousMouseDownX;
+    int previousMouseDownY;
+    int horizontalBorder;
+    int verticalBorder;
 };
 
 #endif // GRAPH_H
