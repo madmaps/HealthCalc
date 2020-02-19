@@ -500,8 +500,49 @@ void Graph::mouseMoveEvent(QMouseEvent *ev)
 void Graph::wheelEvent(QWheelEvent *ev)
 {
     float angle = ev->angleDelta().ry();
+    float screenRatio = (float)((float)this->width() - (float)horizontalBorder) / (float)((float)this->height() - (float)verticalBorder);
+    float differenceX = (endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch()) / (float)((float)this->width() - (float)horizontalBorder);
+    float differenceY = (float)(highWeight - lowWeight) / (float)((float)this->height() - (float)verticalBorder);
+    float centerX = ((float)this->width() - (float)horizontalBorder) / 2;
+    float centerY = ((float)this->height() - (float)verticalBorder) / 2;
+    float movedX = (((float)ev->x() - (float)horizontalBorder) - centerX) * differenceX;
+    float movedY = (centerY - (float)ev->y()) * differenceY;
+    endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() + movedX);
+    startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() + movedX);
+    lowWeight += movedY;
+    highWeight += movedY;
+    float dateDifference = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+    float cropedDate = dateDifference * screenRatio;
+    endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() - (dateDifference / 2) + (cropedDate / 2));
+    startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() + (dateDifference / 2) - (cropedDate / 2));
+    if(angle < 0)
+    {
+        endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() * 1.0002);
+        startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() * .9998);
+        lowWeight *= 0.9998;
+        highWeight *= 1.0002;
+    }
+    else
+    {
+        endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() * 0.9998);
+        startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() * 1.0002);
+        lowWeight *= 1.0002;
+        highWeight *= 0.9998;
+    }
+    dateDifference = endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch();
+    cropedDate = dateDifference * (1/screenRatio);
+    endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() - (dateDifference / 2) + (cropedDate / 2));
+    startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() + (dateDifference / 2) - (cropedDate / 2));
 
-
+    differenceX = (float)(endDate.toSecsSinceEpoch() - startDate.toSecsSinceEpoch()) / ((float)this->width() - (float)horizontalBorder);
+    differenceY = (highWeight - lowWeight) / ((float)this->height() - (float)verticalBorder);
+    movedX = (centerX - ((float)ev->x() - (float)horizontalBorder)) * differenceX;
+    movedY = ((float)ev->y() - centerY) * differenceY;
+    endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() + movedX);
+    startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() + movedX);
+    lowWeight += movedY;
+    highWeight += movedY;
+    update();
 }
 
 
