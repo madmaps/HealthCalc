@@ -40,13 +40,11 @@ private slots:
 
     void on_pushButton_clicked();
 
-    void on_updateGraphButton_clicked();
-
     void on_weightRangeCheckbox_clicked(bool checked);
 
     void on_predictionCheckbox_clicked(bool checked);
 
-    void on_targetWeight_clicked(bool checked);
+    void on_targetWeightCheckBox_clicked(bool checked);
 
 private:
     void updateEntries();

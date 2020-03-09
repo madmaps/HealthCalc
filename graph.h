@@ -14,20 +14,16 @@ class Graph : public QLabel
 {   
     Q_OBJECT
 public:
+    enum graphState{allData, pastWeek, pastTwoWeeks, pastThreeWeeks, pastMonth, fullView, custom};
     explicit Graph(QWidget* parent = 0);
 
     void setListOfEntries(std::vector<Entry>* inListOfEntries);
     void setDataAnalysis(DataAnalysis* inDataAnalysis);
     void updateVariables();
-    void setAutoDate(const bool& inAutoDate);
-    void setAutoWeight(const bool& inAutoWeight);
-    void setStartDate(const QDate& inDate);
-    void setEndDate(const QDate& inDate);
-    void setlowWeight(const float& inLowWeight);
-    void setHighWeight(const float& inHighWeight);
     void setShowPrediction(const bool& inShowPrediction);
     void setShowWeightRange(const bool& inShowWeightRange);
     void setShowTargetWeight(const bool& inShowTargetWeight);
+    void setCurrentState(const graphState& inCurrentState);
 
 
 protected:
@@ -46,10 +42,8 @@ private:
     DataAnalysis* theDataAnalysis;
     QDateTime startDate;
     QDateTime endDate;
-    bool autoDate;
     float lowWeight;
     float highWeight;
-    bool autoWeight;
     float minWeight, maxWeight;
     bool showPrediction;
     bool showWeightRange;
@@ -59,6 +53,7 @@ private:
     int previousMouseDownY;
     int horizontalBorder;
     int verticalBorder;
+    graphState currentState;
 };
 
 #endif // GRAPH_H

@@ -21,8 +21,26 @@ void Graph::setDataAnalysis(DataAnalysis *inDataAnalysis)
 
 void Graph::updateVariables()
 {
+    switch(currentState)
+    {
+    case allData:
+        break;
+    case pastWeek:
+        break;
+    case pastTwoWeeks:
+        break;
+    case pastThreeWeeks:
+        break;
+    case pastMonth:
+        break;
+    case fullView:
+        break;
+    default:
+        break;
+    }
+
     //Finding max weight
-    if(autoWeight)
+    if(1)//autoWeight)
     {
         maxWeight = 0;
         for(Entry check : *listOfEntries)
@@ -52,7 +70,7 @@ void Graph::updateVariables()
         highWeight = maxWeight + (weightRange * 0.20);
         lowWeight = maxWeight - weightRange - (weightRange * 1.0);
     }
-    if(autoDate && listOfEntries->size() > 0)
+    if(listOfEntries->size() > 0)
     {
         startDate = listOfEntries->at(0).getDateTime();
         startDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
@@ -71,47 +89,7 @@ void Graph::updateVariables()
     theDataAnalysis->updateVariables();
 }
 
-void Graph::setAutoDate(const bool &inAutoDate)
-{
-    autoDate = inAutoDate;
-}
 
-void Graph::setAutoWeight(const bool &inAutoWeight)
-{
-    autoWeight = inAutoWeight;
-}
-
-void Graph::setStartDate(const QDate& inDate)
-{
-    if(!autoDate)
-    {
-        startDate = QDateTime(QDate(inDate));
-    }
-}
-
-void Graph::setEndDate(const QDate& inDate)
-{
-    if(!autoDate)
-    {
-        endDate = QDateTime(QDate(inDate));
-    }
-}
-
-void Graph::setlowWeight(const float& inLowWeight)
-{
-    if(!autoWeight)
-    {
-        lowWeight = inLowWeight;
-    }
-}
-
-void Graph::setHighWeight(const float& inHighWeight)
-{
-    if(!autoWeight)
-    {
-        highWeight = inHighWeight;
-    }
-}
 
 void Graph::setShowPrediction(const bool& inShowPrediction)
 {
@@ -128,6 +106,10 @@ void Graph::setShowTargetWeight(const bool& inShowTargetWeight)
     showTargetWeight = inShowTargetWeight;
 }
 
+void Graph::setCurrentState(const graphState &inCurrentState)
+{
+    currentState = inCurrentState;
+}
 
 
 void Graph::paintEvent(QPaintEvent*)
@@ -526,8 +508,6 @@ void Graph::wheelEvent(QWheelEvent *ev)
     float cropedData = dataDifference * screenRatio;
     endDate = QDateTime::fromSecsSinceEpoch(endDate.toSecsSinceEpoch() - (dataDifference / 2) + (cropedData / 2));
     startDate = QDateTime::fromSecsSinceEpoch(startDate.toSecsSinceEpoch() + (dataDifference / 2) - (cropedData / 2));
-
-
     if(angle < 0)
     {
         zoomFactor = fabs(zoomFactor);
@@ -561,32 +541,3 @@ void Graph::wheelEvent(QWheelEvent *ev)
     highWeight += movedY;
     update();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

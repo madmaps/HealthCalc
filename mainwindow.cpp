@@ -17,11 +17,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     newProfile->hide();
     profile = new Profile(QString("Matthew"),QDate(1983,9,12),67,1,235,170);
     theDataAnalysis = new DataAnalysis(profile,listOfEntries);
-    ui->autoDateCheckBox->setCheckState(Qt::Checked);
-    ui->label->setAutoDate(true);
-    ui->label->setAutoWeight(true);
-    ui->autoWeightCheckBox->setCheckState(Qt::Checked);
+    ui->weightRangeCheckbox->setCheckState(Qt::Checked);
+    ui->predictionCheckbox->setCheckState(Qt::Checked);
+    ui->targetWeightCheckBox->setCheckState(Qt::Checked);
     ui->label->setDataAnalysis(theDataAnalysis);
+    ui->predefinedAutosComboBox->addItem(QString("All Data"));
+    ui->predefinedAutosComboBox->addItem(QString("Past Week"));
+    ui->predefinedAutosComboBox->addItem(QString("Past 2 Weeks"));
+    ui->predefinedAutosComboBox->addItem(QString("Past 3 Weeks"));
+    ui->predefinedAutosComboBox->addItem(QString("Past Month"));
+    ui->predefinedAutosComboBox->addItem(QString("Full View"));
+    ui->predefinedAutosComboBox->addItem(QString("Custom"));
+
+
+
     updateProfile();
 
 
@@ -115,13 +124,11 @@ void MainWindow::disableAll(bool inDisable)
 {
     ui->newEntryButton->setDisabled(inDisable);
     ui->removeEntryButton->setDisabled(inDisable);
-    ui->startDateEditBox->setDisabled(inDisable);
-    ui->endDateEditBox->setDisabled(inDisable);
-    ui->highWeightEditBox->setDisabled(inDisable);
-    ui->lowWeightEditBox->setDisabled(inDisable);
-    ui->autoDateCheckBox->setDisabled(inDisable);
-    ui->autoWeightCheckBox->setDisabled(inDisable);
     ui->targetWeightEditBox->setDisabled(inDisable);
+    ui->weightRangeCheckbox->setDisabled(inDisable);
+    ui->predictionCheckbox->setDisabled(inDisable);
+    ui->targetWeightCheckBox->setDisabled(inDisable);
+    ui->predefinedAutosComboBox->setDisabled(inDisable);
 }
 
 void MainWindow::saveFile()
@@ -308,17 +315,6 @@ void MainWindow::on_pushButton_clicked()
     ui->label->update();
 }
 
-void MainWindow::on_updateGraphButton_clicked()
-{
-    ui->label->setAutoDate(ui->autoDateCheckBox->isChecked());
-    ui->label->setAutoWeight(ui->autoWeightCheckBox->isChecked());
-    ui->label->setlowWeight(ui->lowWeightEditBox->text().toFloat());
-    ui->label->setHighWeight(ui->highWeightEditBox->text().toFloat());
-    ui->label->setStartDate(ui->startDateEditBox->date());
-    ui->label->setEndDate(ui->endDateEditBox->date());
-    ui->label->updateVariables();
-    ui->label->update();
-}
 
 void MainWindow::on_weightRangeCheckbox_clicked(bool checked)
 {
@@ -326,14 +322,17 @@ void MainWindow::on_weightRangeCheckbox_clicked(bool checked)
     ui->label->update();
 }
 
+
+
+void MainWindow::on_targetWeightCheckBox_clicked(bool checked)
+{
+    ui->label->setShowTargetWeight(checked);
+    ui->label->update();
+}
+
 void MainWindow::on_predictionCheckbox_clicked(bool checked)
 {
     ui->label->setShowPrediction(checked);
     ui->label->update();
-}
 
-void MainWindow::on_targetWeight_clicked(bool checked)
-{
-    ui->label->setShowTargetWeight(checked);
-    ui->label->update();
 }
