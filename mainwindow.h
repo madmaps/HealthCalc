@@ -8,6 +8,7 @@
 #include "newprofile.h"
 #include "profile.h"
 #include "dataanalysis.h"
+#include "savedata.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -46,6 +47,19 @@ private slots:
 
     void on_targetWeightCheckBox_clicked(bool checked);
 
+    void on_predefinedAutosComboBox_currentIndexChanged(const QString &arg1);
+
+    void on_actionSave_Profile_as_triggered();
+
+    void dontSaveAndExit();
+
+    void cancelExit();
+
+    void on_actionClose_Profile_triggered();
+
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     void updateEntries();
 
@@ -61,9 +75,17 @@ private:
     AddEntry* entryWindow;
     std::vector<Entry>* listOfEntries;
     NewProfile* newProfile;
+    SaveData* newSavedData;
     DataAnalysis* theDataAnalysis;
+    QString currentFile;
     bool profileLoaded;
     Profile* profile;
+    bool dataChanged;
+    bool closingProgram;
+    bool saveAs;
+    bool wantNewProfile;
+    bool loadProfile;
+    bool closeProfile;
 
 };
 #endif // MAINWINDOW_H

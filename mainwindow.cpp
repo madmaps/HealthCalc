@@ -8,18 +8,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     listOfEntries = new std::vector<Entry>();
     profileLoaded = false;
+    dataChanged = false;
+    saveAs = true;
+    closingProgram = false;
+    wantNewProfile = false;
+    loadProfile = false;
+    closeProfile = false;
     ui->setupUi(this);
     ui->label->setListOfEntries(listOfEntries);
+    currentFile = QString("");
     disableAll(true);
     entryWindow = new AddEntry(this);
     entryWindow->hide();
     newProfile = new NewProfile(this);
     newProfile->hide();
-    profile = new Profile(QString("Matthew"),QDate(1983,9,12),67,1,235,170);
+    newSavedData = new SaveData(this);
+    newSavedData->hide();
+    profile = new Profile(QString(""),QDate(1970,1,01),60,1,100,100);
     theDataAnalysis = new DataAnalysis(profile,listOfEntries);
     ui->weightRangeCheckbox->setCheckState(Qt::Checked);
+    ui->label->setShowPrediction(true);
     ui->predictionCheckbox->setCheckState(Qt::Checked);
+    ui->label->setShowWeightRange(true);
     ui->targetWeightCheckBox->setCheckState(Qt::Checked);
+    ui->label->setShowTargetWeight(true);
     ui->label->setDataAnalysis(theDataAnalysis);
     ui->predefinedAutosComboBox->addItem(QString("All Data"));
     ui->predefinedAutosComboBox->addItem(QString("Past Week"));
@@ -28,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->predefinedAutosComboBox->addItem(QString("Past Month"));
     ui->predefinedAutosComboBox->addItem(QString("Full View"));
     ui->predefinedAutosComboBox->addItem(QString("Custom"));
+    ui->predefinedAutosComboBox->setCurrentIndex(0);
+    ui->label->setCurrentState(ui->label->allData);
 
 
 
@@ -36,7 +50,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(entryWindow,SIGNAL(addNewEntry(float,QDateTime,unsigned int, unsigned int)),this,SLOT(gettingNewEntry(float,QDateTime,unsigned int,unsigned int)));
     connect(newProfile,SIGNAL(newProfile(Profile)),this,SLOT(gettingNewProfile(Profile)));
-
+    connect(newSavedData,SIGNAL(saveButtonPressed()),this,SLOT(on_actionSave_Profile_triggered()));
+    connect(newSavedData,SIGNAL(dontSaveButtonPressed()),this,SLOT(dontSaveAndExit()));
+    connect(newSavedData,SIGNAL(cancelButtonPressed()),this,SLOT(cancelExit()));
 
 }
 
@@ -46,6 +62,7 @@ MainWindow::~MainWindow()
     delete profile;
     delete newProfile;
     delete entryWindow;
+    delete newSavedData;
     delete ui;
 }
 
@@ -54,6 +71,7 @@ void MainWindow::gettingNewEntry(float inWeight,QDateTime inDateTime,unsigned in
     Entry newEntry(inWeight,inDateTime,inCaloriesConsumed,inCaloriesBurned);
     listOfEntries->push_back(newEntry);
     updateEntries();
+    dataChanged = true;
 }
 
 void MainWindow::gettingNewProfile(Profile inProfile)
@@ -67,6 +85,14 @@ void MainWindow::gettingNewProfile(Profile inProfile)
     updateProfile();
     listOfEntries->clear();
     updateEntries();
+    dataChanged = true;
+    currentFile = QString("");
+    saveAs = true;
+    closingProgram = false;
+    wantNewProfile = false;
+    loadProfile = false;
+    closeProfile = false;
+    disableAll(false);
 }
 
 void MainWindow::on_newEntryButton_clicked()
@@ -77,6 +103,7 @@ void MainWindow::on_newEntryButton_clicked()
 
 void MainWindow::on_actionExit_triggered()
 {
+    saveAs = false;
     this->close();
 }
 
@@ -93,7 +120,39 @@ void MainWindow::on_removeEntryButton_clicked()
         }
         listOfEntries->pop_back();
         updateEntries();
+        dataChanged = true;
     }
+}
+
+void MainWindow::dontSaveAndExit()
+{
+    dataChanged = false;
+    newSavedData->hide();
+    if(wantNewProfile)
+    {
+        this->on_actionNew_Profile_triggered();
+    }
+    else if(loadProfile)
+    {
+        this->on_actionOpen_Projile_triggered();
+    }
+    else if(closeProfile)
+    {
+        this->on_actionClose_Profile_triggered();
+    }
+    else
+    {
+        this->close();
+    }
+}
+
+void MainWindow::cancelExit()
+{
+    newSavedData->hide();
+    closingProgram = false;
+    wantNewProfile = false;
+    loadProfile = false;
+    closeProfile = false;
 }
 
 void MainWindow::updateEntries()
@@ -116,10 +175,62 @@ void MainWindow::updateEntries()
 
 void MainWindow::on_actionNew_Profile_triggered()
 {
-    disableAll(false);
-    newProfile->show();
+    if(dataChanged)
+    {
+        wantNewProfile = true;
+        newSavedData->show();
+    }
+    else
+    {
+        newProfile->show();
+    }
 }
 
+void MainWindow::on_actionClose_Profile_triggered()
+{
+    if(dataChanged)
+    {
+        closeProfile = true;
+        newSavedData->show();
+    }
+    else
+    {
+        loadProfile = false;
+        closingProgram = false;
+        wantNewProfile = false;
+        closeProfile = false;
+        currentFile = QString("");
+        saveAs = true;
+        if(profile != 0)
+        {
+            delete profile;
+            profile = 0;
+        }
+        profile = new Profile(QString(""),QDate(1970,1,01),60,1,100,100);
+        updateProfile();
+        listOfEntries->clear();
+        updateEntries();
+        dataChanged = false;
+        disableAll(true);
+    }
+}
+
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    closingProgram = true;
+    if(dataChanged)
+    {
+        newSavedData->show();
+        event->ignore();
+    }
+    else
+    {
+        event->accept();
+    }
+
+
+}
 void MainWindow::disableAll(bool inDisable)
 {
     ui->newEntryButton->setDisabled(inDisable);
@@ -129,11 +240,20 @@ void MainWindow::disableAll(bool inDisable)
     ui->predictionCheckbox->setDisabled(inDisable);
     ui->targetWeightCheckBox->setDisabled(inDisable);
     ui->predefinedAutosComboBox->setDisabled(inDisable);
+    ui->pushButton->setDisabled(inDisable);
 }
 
 void MainWindow::saveFile()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,tr("Save File"));
+    QString fileName;
+    if(currentFile.compare(QString("")) == 0 || saveAs)
+    {
+        fileName = QFileDialog::getSaveFileName(this,tr("Save File"));
+    }
+    else
+    {
+        fileName = currentFile;
+    }
     QFile outFile(fileName);
     if(outFile.open(QIODevice::WriteOnly))
     {
@@ -186,7 +306,26 @@ void MainWindow::saveFile()
             delete entryData;
             i++;
         }
-    delete[] temp;
+        delete[] temp;
+        currentFile = fileName;
+        dataChanged = false;
+        newSavedData->hide();
+        if(closingProgram)
+        {
+            this->close();
+        }
+        if(wantNewProfile)
+        {
+            this->on_actionNew_Profile_triggered();
+        }
+        if(loadProfile)
+        {
+            this->on_actionOpen_Projile_triggered();
+        }
+        if(closeProfile)
+        {
+            this->on_actionClose_Profile_triggered();
+        }
     }
 }
 
@@ -198,6 +337,13 @@ void MainWindow::loadFile()
         QFile inFile(fileName);
         if(inFile.open(QIODevice::ReadOnly))
         {
+            currentFile = fileName;
+            loadProfile = false;
+            closingProgram = false;
+            wantNewProfile = false;
+            dataChanged = false;
+            closeProfile = false;
+            disableAll(false);
             const int header = 9;
             QByteArray data = inFile.readAll();
             inFile.close();
@@ -255,7 +401,6 @@ void MainWindow::loadFile()
                         }
                         updateEntries();
                         theDataAnalysis->updateVariables();
-                        //ui->label->updateVariables();
                         entryData->clear();
                         delete entryData;
                         fileLocation += overallSize;
@@ -299,12 +444,28 @@ void MainWindow::updateProfile()
 
 void MainWindow::on_actionSave_Profile_triggered()
 {
+    saveAs = false;
     saveFile();
 }
 
+void MainWindow::on_actionSave_Profile_as_triggered()
+{
+    saveAs = true;
+    saveFile();
+}
+
+
 void MainWindow::on_actionOpen_Projile_triggered()
 {
-    loadFile();
+    if(dataChanged)
+    {
+        loadProfile = true;
+        newSavedData->show();
+    }
+    else
+    {
+        loadFile();
+    }
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -336,3 +497,44 @@ void MainWindow::on_predictionCheckbox_clicked(bool checked)
     ui->label->update();
 
 }
+
+/*ui->predefinedAutosComboBox->addItem(QString("All Data"));
+ui->predefinedAutosComboBox->addItem(QString("Past Week"));
+ui->predefinedAutosComboBox->addItem(QString("Past 2 Weeks"));
+ui->predefinedAutosComboBox->addItem(QString("Past 3 Weeks"));
+ui->predefinedAutosComboBox->addItem(QString("Past Month"));
+ui->predefinedAutosComboBox->addItem(QString("Full View"));
+ui->predefinedAutosComboBox->addItem(QString("Custom"));
+*/
+
+void MainWindow::on_predefinedAutosComboBox_currentIndexChanged(const QString &arg1)
+{
+    if(QString("All Data").compare(arg1) == 0)
+    {
+        ui->label->setCurrentState(ui->label->allData);
+    }
+    else if(QString("Past Week").compare(arg1) == 0)
+    {
+        ui->label->setCurrentState(ui->label->pastWeek);
+    }
+    else if(QString("Past 2 Weeks").compare(arg1) == 0)
+    {
+        ui->label->setCurrentState(ui->label->pastTwoWeeks);
+    }
+    else if(QString("Past 3 Weeks").compare(arg1) == 0)
+    {
+        ui->label->setCurrentState(ui->label->pastThreeWeeks);
+    }
+    else if(QString("Past Month").compare(arg1) == 0)
+    {
+        ui->label->setCurrentState(ui->label->pastMonth);
+    }
+    else if(QString("Full View").compare(arg1) == 0)
+    {
+        ui->label->setCurrentState(ui->label->fullView);
+    }
+    ui->label->updateVariables();
+    ui->label->update();
+}
+
+

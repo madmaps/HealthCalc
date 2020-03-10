@@ -21,23 +21,135 @@ void Graph::setDataAnalysis(DataAnalysis *inDataAnalysis)
 
 void Graph::updateVariables()
 {
-    switch(currentState)
+    qint64 secondsFromBegToEnd = 0;
+    float weightRange = 0;
+    std::vector<Entry>::iterator startDateIter, countIter;
+    bool complete = false;
+    if(listOfEntries->size() > 1)
     {
-    case allData:
-        break;
-    case pastWeek:
-        break;
-    case pastTwoWeeks:
-        break;
-    case pastThreeWeeks:
-        break;
-    case pastMonth:
-        break;
-    case fullView:
-        break;
-    default:
-        break;
+        startDate = listOfEntries->at(0).getDateTime();
+        secondsFromBegToEnd = listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch();
+        switch(currentState)
+        {
+        case allData:
+            startDate = listOfEntries->at(0).getDateTime();
+            startDateIter = listOfEntries->begin();
+            break;
+        case pastWeek:
+            if(secondsFromBegToEnd > (60 * 60 * 24 * 7))
+            {
+                startDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - (60 * 60 * 24 * 7));
+            }
+            break;
+        case pastTwoWeeks:
+            if(secondsFromBegToEnd > (60 * 60 * 24 * 14))
+            {
+                startDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - (60 * 60 * 24 * 14));
+            }
+            break;
+        case pastThreeWeeks:
+            if(secondsFromBegToEnd > (60 * 60 * 24 * 21))
+            {
+                startDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - (60 * 60 * 24 * 21));
+            }
+            break;
+        case pastMonth:
+            if(secondsFromBegToEnd > (60 * 60 * 24 * 30))
+            {
+                startDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - (60 * 60 * 24 * 30));
+            }
+            break;
+        case fullView:
+            startDate = listOfEntries->at(0).getDateTime();
+            break;
+        default:
+            startDate = listOfEntries->at(0).getDateTime();
+            startDateIter = listOfEntries->begin();
+            break;
+        }
+        complete = false;
+        for(countIter = listOfEntries->begin(); countIter < listOfEntries->end() && !complete; countIter++)
+        {
+            if(countIter->getDateTime().toSecsSinceEpoch() > startDate.toSecsSinceEpoch())
+            {
+                startDateIter = --countIter;
+                complete = true;
+            }
+        }
+
+        startDate = QDateTime(QDate(startDate.date().year(),startDate.date().month(),startDate.date().day()));
+        secondsFromBegToEnd = listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - startDateIter->getDateTime().toSecsSinceEpoch();
+        // If less than 5 days make it 5 days
+        if(secondsFromBegToEnd < 432000)
+        {
+            secondsFromBegToEnd = 432000;
+        }
+        endDate = QDateTime::fromSecsSinceEpoch(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() + (secondsFromBegToEnd * 1.0));
+        endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
+        endDate = QDateTime(endDate.date().addDays(1));
+        maxWeight = 0;
+        for(countIter = startDateIter; countIter < listOfEntries->end(); countIter++)
+        {
+            if(countIter->getWeight() > maxWeight)
+            {
+                maxWeight = countIter->getWeight();
+            }
+        }
+        minWeight = 9999999;
+        for(countIter = startDateIter; countIter < listOfEntries->end(); countIter++)
+        {
+            if(countIter->getWeight() < minWeight)
+            {
+                minWeight = countIter->getWeight();
+            }
+        }
+        weightRange = maxWeight - minWeight;
+        if(weightRange < 5)
+        {
+            weightRange = 5;
+        }
+        highWeight = maxWeight + (weightRange * 0.20);
+        lowWeight = maxWeight - weightRange - (weightRange * 1.0);
+
     }
+        /*for(Entry check : *listOfEntries)
+        {
+            if(check.getWeight()>maxWeight)
+            {
+                maxWeight = check.getWeight();
+            }
+        }
+        weightRange = maxWeight - minWeight;
+        if(weightRange < 5)
+        {
+            weightRange = 5;
+        }
+        highWeight = maxWeight + (weightRange * 0.20);
+        lowWeight = maxWeight - weightRange - (weightRange * 1.0);
+    }
+        //Finding min weight
+        minWeight = 999999;
+        for(Entry check : *listOfEntries)
+        {
+            if(check.getWeight() < minWeight)
+            {
+                minWeight = check.getWeight();
+            }
+        }
+        weightRange = maxWeight - minWeight;
+        if(weightRange < 5)
+        {
+            weightRange = 5;
+        }
+        highWeight = maxWeight + (weightRange * 0.20);
+        lowWeight = maxWeight - weightRange - (weightRange * 1.0);
+
+
+
+
+
+
+
 
     //Finding max weight
     if(1)//autoWeight)
@@ -85,7 +197,7 @@ void Graph::updateVariables()
         endDate = QDateTime(QDate(endDate.date().year(),endDate.date().month(),endDate.date().day()));
         endDate = QDateTime(endDate.date().addDays(1));
     }
-
+*/
     theDataAnalysis->updateVariables();
 }
 

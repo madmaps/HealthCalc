@@ -24,7 +24,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     newprofile.cpp \
-    profile.cpp
+    profile.cpp \
+    savedata.cpp
 
 HEADERS += \
     addentry.h \
@@ -34,12 +35,14 @@ HEADERS += \
     graph.h \
     mainwindow.h \
     newprofile.h \
-    profile.h
+    profile.h \
+    savedata.h
 
 FORMS += \
     addentry.ui \
     mainwindow.ui \
-    newprofile.ui
+    newprofile.ui \
+    savedata.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
