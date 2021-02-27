@@ -27,6 +27,7 @@ public:
     float getEstimatedFatBurned()const;
     int getAverageCaloriesPerDay() const;
     float getTargetWeight() const;
+    void setPredictionAverage(const int inValue);
 private:
     void updateMaxWeight();
     void updateMinWeight();
@@ -42,6 +43,7 @@ private:
     int unaccountedForCalories;
     float weightRange;
     int averageCaloriesPerDay;
+    unsigned int predictionAverage;
 };
 
 #endif // DATAANALYSIS_H

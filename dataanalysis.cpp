@@ -10,6 +10,7 @@ DataAnalysis::DataAnalysis()
     unaccountedForCalories = 0;
     weightRange = 0;
     averageCaloriesPerDay = 0;
+    predictionAverage = 0;
 }
 
 DataAnalysis::DataAnalysis(Profile* inProfile, std::vector<Entry>* inListOfEntries)
@@ -22,6 +23,7 @@ DataAnalysis::DataAnalysis(Profile* inProfile, std::vector<Entry>* inListOfEntri
     unaccountedForCalories = 0;
     weightRange = 0;
     averageCaloriesPerDay = 0;
+    predictionAverage = 0;
 }
 
 DataAnalysis::~DataAnalysis()
@@ -118,6 +120,11 @@ qint64 DataAnalysis::getBMRDataSecondsSinceEpoch(unsigned int inIndex) const
 float DataAnalysis::getTargetWeight() const
 {
     return theProfile->getTargetWeight();
+}
+
+void DataAnalysis::setPredictionAverage(const int inValue)
+{
+    predictionAverage = inValue;
 }
 
 QDate DataAnalysis::getDateOfGoal() const

@@ -537,4 +537,44 @@ void MainWindow::on_predefinedAutosComboBox_currentIndexChanged(const QString &a
     ui->label->update();
 }
 
+void MainWindow::on_actionAll_Data_triggered()
+{
+    theDataAnalysis->setPredictionAverage(0);
+    ui->label->updateVariables();
+    ui->label->update();
+}
 
+void MainWindow::on_actionmonth_triggered()
+{
+    theDataAnalysis->setPredictionAverage(1);
+    ui->label->updateVariables();
+    ui->label->update();
+}
+
+void MainWindow::on_action3_weeks_triggered()
+{
+    theDataAnalysis->setPredictionAverage(2);
+    ui->label->updateVariables();
+    ui->label->update();
+}
+
+void MainWindow::on_action2_weeks_triggered()
+{
+    theDataAnalysis->setPredictionAverage(3);
+    ui->label->updateVariables();
+    ui->label->update();
+}
+
+void MainWindow::on_actionPast_week_triggered()
+{
+    theDataAnalysis->setPredictionAverage(4);
+    ui->label->updateVariables();
+    ui->label->update();
+}
+
+void MainWindow::on_actionDay_triggered()
+{
+    theDataAnalysis->setPredictionAverage(5);
+    ui->label->updateVariables();
+    ui->label->update();
+}
