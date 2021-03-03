@@ -294,24 +294,6 @@
            </item>
           </layout>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_16">
-           <item>
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Average Loss per Week:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="avgLossPerWeekLabel">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
         </layout>
        </widget>
       </item>
@@ -577,6 +559,7 @@
     <property name="title">
      <string>Prediction</string>
     </property>
+    <addaction name="actionDay"/>
     <addaction name="actionPast_week"/>
     <addaction name="action2_weeks"/>
     <addaction name="action3_weeks"/>
@@ -657,6 +640,14 @@
    </property>
    <property name="text">
     <string>All Data</string>
+   </property>
+  </action>
+  <action name="actionDay">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Day</string>
    </property>
   </action>
  </widget>

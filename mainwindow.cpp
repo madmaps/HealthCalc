@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->predefinedAutosComboBox->addItem(QString("Custom"));
     ui->predefinedAutosComboBox->setCurrentIndex(0);
     ui->label->setCurrentState(ui->label->allData);
+    clearPredictionChecks();
+    ui->actionAll_Data->setChecked(true);
+    theDataAnalysis->setPredictionAverage(0);
 
 
 
@@ -171,6 +174,11 @@ void MainWindow::updateEntries()
     QDate predictionTargetDate = theDataAnalysis->getDateOfGoal();
     ui->estDateWeightLossLabel->setText(predictionTargetDate.toString());
     ui->estFatBurnedLabel->setText(QString::number(floor(theDataAnalysis->getEstimatedFatBurned()*10)/10) + QString(" Lbs"));
+    if(listOfEntries->size() > 0)
+    {
+        ui->totalWeightLossLabel->setText(QString::number(profile->getInitialWeight() - listOfEntries->at(listOfEntries->size() - 1).getWeight()));
+
+    }
 }
 
 void MainWindow::on_actionNew_Profile_triggered()
@@ -539,42 +547,71 @@ void MainWindow::on_predefinedAutosComboBox_currentIndexChanged(const QString &a
 
 void MainWindow::on_actionAll_Data_triggered()
 {
+    clearPredictionChecks();
+    ui->actionAll_Data->setChecked(true);
     theDataAnalysis->setPredictionAverage(0);
     ui->label->updateVariables();
     ui->label->update();
+    on_pushButton_clicked();
 }
 
 void MainWindow::on_actionmonth_triggered()
 {
+    clearPredictionChecks();
+    ui->actionmonth->setChecked(true);
     theDataAnalysis->setPredictionAverage(1);
     ui->label->updateVariables();
     ui->label->update();
+    on_pushButton_clicked();
 }
 
 void MainWindow::on_action3_weeks_triggered()
 {
+    clearPredictionChecks();
+    ui->action3_weeks->setChecked(true);
     theDataAnalysis->setPredictionAverage(2);
     ui->label->updateVariables();
     ui->label->update();
+    on_pushButton_clicked();
 }
 
 void MainWindow::on_action2_weeks_triggered()
 {
+    clearPredictionChecks();
+    ui->action2_weeks->setChecked(true);
     theDataAnalysis->setPredictionAverage(3);
     ui->label->updateVariables();
     ui->label->update();
+    on_pushButton_clicked();
 }
 
 void MainWindow::on_actionPast_week_triggered()
 {
+    clearPredictionChecks();
+    ui->actionPast_week->setChecked(true);
     theDataAnalysis->setPredictionAverage(4);
     ui->label->updateVariables();
     ui->label->update();
+    on_pushButton_clicked();
 }
 
 void MainWindow::on_actionDay_triggered()
 {
+    clearPredictionChecks();
+    ui->actionDay->setChecked(true);
     theDataAnalysis->setPredictionAverage(5);
     ui->label->updateVariables();
     ui->label->update();
+    on_pushButton_clicked();
 }
+
+void MainWindow::clearPredictionChecks()
+{
+    ui->actionDay->setChecked(false);
+    ui->actionPast_week->setChecked(false);
+    ui->action2_weeks->setChecked(false);
+    ui->action3_weeks->setChecked(false);
+    ui->actionmonth->setChecked(false);
+    ui->actionAll_Data->setChecked(false);
+}
+

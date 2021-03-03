@@ -290,7 +290,49 @@ void DataAnalysis::updateAverageCaloriesPerDay()
     {
         if(listOfEntries->size() > 1)
         {
-            unsigned int i = 0;
+            qint64 secondsToGoBack = 0;
+            switch(predictionAverage)
+            {
+                default:
+                case 0:// All data
+                    secondsToGoBack = listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch() + 60;
+                    break;
+                case 1:// Month
+                    secondsToGoBack = 60 * 60 * 24 * 30;
+                    break;
+                case 2:// 3 Weeks
+                    secondsToGoBack = 60 * 60 * 24 * 21;
+                    break;
+                case 3:// 2 Weeks
+                    secondsToGoBack = 60 * 60 * 24 * 14;
+                    break;
+                case 4:// 1 Week
+                    secondsToGoBack = 60 * 60 * 24 * 7;
+                    break;
+                case 5:// 1 Day
+                    secondsToGoBack = 60 * 60 * 24;
+                    break;
+            }
+            float totalCalories = 0;
+            int i = listOfEntries->size() - 1;
+            bool complete = false;
+            while(i >= 0 && !complete)
+            {
+                if(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() -  secondsToGoBack < listOfEntries->at(i).getDateTime().toSecsSinceEpoch())
+                {
+                    totalCalories += (int)listOfEntries->at(i).getCaloriesConsumed() - (int)listOfEntries->at(i).getCaloriesBurned();
+                }
+                else
+                {
+                    complete = true;
+                }
+                i--;
+            }
+            i++;
+            float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(i).getDateTime().toSecsSinceEpoch()) / (60 * 60 * 24);
+            averageCaloriesPerDay = totalCalories / totalDays;
+            averageCaloriesPerDay += unaccountedForCalories;
+            /*unsigned int i = 0;
             float totalCalories = 0;
             while(i < listOfEntries->size())
             {
@@ -299,7 +341,7 @@ void DataAnalysis::updateAverageCaloriesPerDay()
             }
             float totalDays = (float)(listOfEntries->at(listOfEntries->size()-1).getDateTime().toSecsSinceEpoch() - listOfEntries->at(0).getDateTime().toSecsSinceEpoch())/ (60 * 60 * 24);
             averageCaloriesPerDay = totalCalories / totalDays;
-            averageCaloriesPerDay += unaccountedForCalories;
+            averageCaloriesPerDay += unaccountedForCalories;*/
         }
     }
 }

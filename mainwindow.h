@@ -57,6 +57,18 @@ private slots:
 
     void on_actionClose_Profile_triggered();
 
+    void on_actionPast_week_triggered();
+
+    void on_actionAll_Data_triggered();
+
+    void on_actionmonth_triggered();
+
+    void on_action3_weeks_triggered();
+
+    void on_action2_weeks_triggered();
+
+    void on_actionDay_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event) override;
 
@@ -70,6 +82,8 @@ private:
     void loadFile();
 
     void updateProfile();
+
+    void clearPredictionChecks();
 
     Ui::MainWindow *ui;
     AddEntry* entryWindow;
